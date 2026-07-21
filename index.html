@@ -1,48 +1,619 @@
-function updateCurrentBoilerUI() {
-    const current = boilers.find(b => b.id === selectedBoilerId);
-    if (!current) return;
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>碩豐鍋爐 - 日常巡檢與維修履歷平台</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    </style>
+</head>
+<body class="h-full flex overflow-hidden font-sans antialiased">
 
-    // 1. 同步 Header Title 與 左側備註
-    document.getElementById('headerBoilerTitle').innerText = current.name;
-    document.getElementById('leftBoilerDetailDisplay').innerText = current.detail || '無填寫規格資料';
+    <!-- 側邊導覽列 -->
+    <aside class="w-72 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0">
+        <div class="overflow-y-auto">
+            <!-- Logo 區塊 -->
+            <div class="h-16 flex items-center px-4 border-b border-slate-800 bg-slate-900/50 gap-3">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-sky-500/20">
+                    <i class="fa-solid fa-fire-flame-curved text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wide text-white">碩豐熱能</h1>
+                    <p class="text-[10px] text-slate-400">巡檢與履歷管理平台</p>
+                </div>
+            </div>
 
-    // 2. 同步管理彈窗
-    document.getElementById('editBoilerName').value = current.name;
-    document.getElementById('editBoilerType').value = current.type;
-    document.getElementById('editBoilerDetail').value = current.detail || '';
+            <!-- 左側設備選擇與管理區塊 -->
+            <div class="p-4 border-b border-slate-800/80 bg-slate-900/40 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <label for="leftBoilerSelect" class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-industry text-sky-400"></i> 當前巡檢設備：
+                    </label>
+                    <button onclick="toggleBoilerManager()" class="text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-1 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
+                        <i class="fa-solid fa-gear"></i> 管理
+                    </button>
+                </div>
+                
+                <!-- 設備選單 -->
+                <select id="leftBoilerSelect" onchange="onBoilerChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-1 focus:ring-sky-500 focus:outline-none">
+                </select>
 
-    // 3. 取得該設備的最後一筆歷史紀錄（作參考用）
-    const records = boilerRecords[selectedBoilerId] || [];
-    const lastRecord = records.length > 0 ? records[records.length - 1] : null;
+                <!-- 同步顯示選擇設備的詳細資訊卡片 -->
+                <div class="p-2.5 bg-slate-950/60 rounded-lg border border-slate-800 text-[11px] space-y-1">
+                    <div class="text-slate-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info text-sky-400 text-[10px]"></i>
+                        <span class="font-medium text-slate-300">設備規格與備註：</span>
+                    </div>
+                    <p id="leftBoilerDetailDisplay" class="text-slate-300 font-mono leading-relaxed pl-3.5 break-words">
+                        加載中...
+                    </p>
+                </div>
 
-    // 4. 動態標籤與表單清空（Placeholder 顯示上一筆紀錄）
-    const badge = document.getElementById('headerBoilerBadge');
-    const dynamicLabel = document.getElementById('lblDynamicParam');
-    const thDynamic = document.getElementById('thDynamicParam');
-    const dynamicInput = document.getElementById('inputDynamicParam');
+                <!-- 設備新增/修改管理彈窗面板 -->
+                <div id="boilerManagerBox" class="hidden p-3 mt-2 bg-slate-900 rounded-lg border border-sky-500/30 text-xs space-y-2">
+                    <div class="font-bold text-slate-200 flex justify-between items-center border-b border-slate-800 pb-1">
+                        <span>設備項目管理</span>
+                        <button onclick="toggleBoilerManager()" class="text-slate-400 hover:text-white">✕</button>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-0.5">設備名稱：</label>
+                        <input type="text" id="editBoilerName" placeholder="輸入設備名稱..." class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-0.5">鍋爐類型：</label>
+                        <select id="editBoilerType" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs">
+                            <option value="steam">蒸氣鍋爐</option>
+                            <option value="hotwater">熱水鍋爐</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-0.5">設備規格 / 備註資訊：</label>
+                        <textarea id="editBoilerDetail" rows="2" placeholder="例: 型號: HW-5000, 出水設定溫度: 85 °C" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none"></textarea>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button onclick="saveCurrentBoilerName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-1 rounded text-[11px] font-medium">修改此設備</button>
+                        <button onclick="addNewBoiler()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1 rounded text-[11px] font-medium">新增為新設備</button>
+                    </div>
+                </div>
+            </div>
 
-    if (current.type === 'hotwater') {
-        badge.innerText = "熱水鍋爐";
-        badge.className = "text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium me-2";
-        dynamicLabel.innerText = "熱水出水溫度 (°C)";
-        if (thDynamic) thDynamic.innerText = "熱水溫度 (°C)";
-        dynamicInput.placeholder = lastRecord ? `前次: ${lastRecord.dynamicVal} °C` : "請輸入熱水溫度";
-    } else {
-        badge.innerText = "蒸氣鍋爐";
-        badge.className = "text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full font-medium me-2";
-        dynamicLabel.innerText = "蒸氣壓力 (MPa)";
-        if (thDynamic) thDynamic.innerText = "蒸氣壓力 (MPa)";
-        dynamicInput.placeholder = lastRecord ? `前次: ${lastRecord.dynamicVal} MPa` : "請輸入蒸氣壓力";
-    }
+            <!-- 選單項目 -->
+            <nav class="p-4 space-y-1">
+                <a href="#" onclick="switchTab('inspection')" id="nav-inspection" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors bg-brand-600 text-white">
+                    <i class="fa-solid fa-clipboard-check w-5 text-sky-400"></i> 日常巡檢填報
+                </a>
+                <a href="#" onclick="switchTab('trends')" id="nav-trends" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-chart-line w-5 text-emerald-400"></i> 巡檢數據與趨勢
+                </a>
+                <a href="#" onclick="switchTab('maintenance')" id="nav-maintenance" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-wrench w-5 text-amber-400"></i> 維修保養履歷
+                </a>
+                <a href="#" onclick="switchTab('reminders')" id="nav-reminders" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-bell w-5 text-purple-400"></i> 巡檢提醒與排程
+                </a>
+            </nav>
+        </div>
 
-    // 清空輸入框與備註，避免誤送舊資料
-    dynamicInput.value = "";
-    document.getElementById('inputFlueTemp').value = "";
-    document.getElementById('inputFlueTemp').placeholder = lastRecord ? `前次: ${lastRecord.flueTemp} °C` : "請輸入排煙溫度";
-    
-    document.getElementById('inputWaterTemp').value = "";
-    document.getElementById('inputWaterTemp').placeholder = lastRecord ? `前次: ${lastRecord.waterTemp} °C` : "請輸入給水溫度";
+        <!-- 底部巡檢員資訊 -->
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-sky-600/30 border border-sky-500/50 flex items-center justify-center text-xs font-bold text-sky-300">巡</div>
+                    <div class="text-xs">
+                        <p class="text-white font-medium flex items-center gap-1">
+                            <span id="inspectorName">張工程師</span>
+                        </p>
+                        <p class="text-slate-400 text-[10px]" id="inspectorDept">廠區維護組</p>
+                    </div>
+                </div>
+                <button onclick="toggleInspectorForm()" class="text-slate-400 hover:text-sky-400 text-xs p-1" title="修改巡檢員姓名">
+                    <i class="fa-solid fa-user-pen"></i>
+                </button>
+            </div>
 
-    document.getElementById('inputHardness').value = "";
-    document.getElementById('inputNotes').value = "";
-}
+            <div id="inspectorFormBox" class="hidden mt-3 pt-2 border-t border-slate-800 space-y-2 text-xs">
+                <div>
+                    <label class="block text-[10px] text-slate-400">巡檢員姓名：</label>
+                    <input type="text" id="inputInspectorName" value="張工程師" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-slate-100 text-xs">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400">所屬部門/組別：</label>
+                    <input type="text" id="inputInspectorDept" value="廠區維護組" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-slate-100 text-xs">
+                </div>
+                <button onclick="saveInspectorInfo()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-1 rounded text-[11px]">儲存巡檢員資料</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 主要內容區塊 -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-900">
+        
+        <!-- 頂部 Header & 巡檢提醒 Banner -->
+        <header class="border-b border-slate-800 bg-slate-950/40 px-6 py-3 shrink-0 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-400">當前選擇：</span>
+                <span id="headerBoilerTitle" class="text-sm font-bold text-sky-400">#1 貫流式蒸氣鍋爐 (1.5 Ton/hr)</span>
+                <span id="headerBoilerBadge" class="text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full font-medium me-2">蒸氣鍋爐</span>
+            </div>
+
+            <div id="reminderBanner" class="flex items-center gap-3 px-4 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-xs">
+                <i class="fa-solid fa-clock-rotate-left text-base animate-pulse"></i>
+                <div>
+                    <span class="font-bold">【巡檢提醒】</span>
+                    <span>距離今天「班次巡檢」填報期限剩餘 <strong>01:45:00</strong></span>
+                </div>
+                <button onclick="switchTab('inspection')" class="ml-2 px-2 py-0.5 bg-amber-500 text-slate-950 font-bold rounded text-[11px] hover:bg-amber-400">立即填報</button>
+            </div>
+        </header>
+
+        <!-- 頁籤內容區 -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- TAB 1: 巡檢資料填報 -->
+            <div id="tab-inspection" class="tab-content space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 輸入表單 -->
+                    <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/60 rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                <i class="fa-solid fa-pen-to-square text-sky-400"></i> 新增日常巡檢紀錄
+                            </h2>
+                            <span class="text-xs text-slate-400" id="currentDateStr">2026-07-21</span>
+                        </div>
+
+                        <form id="inspectionForm" onsubmit="submitInspection(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                                <div>
+                                    <label id="lblDynamicParam" class="block text-slate-300 mb-1">蒸氣壓力 (MPa)</label>
+                                    <input type="number" step="any" id="inputDynamicParam" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 mb-1">排煙溫度 (°C)</label>
+                                    <input type="number" step="any" id="inputFlueTemp" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 mb-1">給水溫度 (°C)</label>
+                                    <input type="number" step="any" id="inputWaterTemp" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 mb-1">水質硬度 (ppm)</label>
+                                    <input type="number" step="any" id="inputHardness" required placeholder="請輸入水質硬度" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="border-t border-slate-700/60 pt-4">
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">現場檢查項目：</label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                                    <label class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded border border-slate-700/50 cursor-pointer">
+                                        <input type="checkbox" checked class="rounded text-sky-500 focus:ring-0"> 燃燒火焰顏色正常
+                                    </label>
+                                    <label class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded border border-slate-700/50 cursor-pointer">
+                                        <input type="checkbox" checked class="rounded text-sky-500 focus:ring-0"> 泵浦運轉無異音
+                                    </label>
+                                    <label class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded border border-slate-700/50 cursor-pointer">
+                                        <input type="checkbox" checked class="rounded text-sky-500 focus:ring-0"> 水位計與安全閥無洩漏
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-slate-300 text-xs mb-1">巡檢備註：</label>
+                                <textarea id="inputNotes" rows="2" placeholder="備註說明..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-sky-500 focus:outline-none"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-lg transition-all text-xs flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> 儲存巡檢紀錄
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- AI 即時診斷 -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 flex flex-col justify-between">
+                        <div>
+                            <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
+                                <i class="fa-solid fa-microchip text-purple-400"></i> AI 巡檢即時診斷
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700">
+                                    <p class="text-xs text-slate-400">設備當前健康度預估</p>
+                                    <p class="text-2xl font-bold text-emerald-400 mt-1" id="aiHealthScore">96 / 100</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="aiAlertNotice" class="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300">
+                            <i class="fa-solid fa-check-circle me-1"></i> 巡檢數據正常，請持續保持。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: 巡檢歷史數據與趨勢圖表 -->
+            <div id="tab-trends" class="tab-content hidden space-y-6">
+                <!-- 圖表容器 -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
+                    <h2 class="font-semibold text-slate-200 mb-2 flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期巡檢數據綜合趨勢圖
+                    </h2>
+                    <div class="relative w-full h-44">
+                        <canvas id="inspectionTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 下方對照表版面 -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-table-list text-sky-400"></i> 歷史巡檢數據詳細對照表
+                        </h3>
+                        <span class="text-xs text-slate-400">（數據實時同步）</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-300">
+                            <thead class="bg-slate-950/80 text-slate-300 border-b border-slate-700 uppercase font-semibold">
+                                <tr>
+                                    <th class="p-3.5">巡檢日期</th>
+                                    <th class="p-3.5">排煙溫度 (°C)</th>
+                                    <th class="p-3.5" id="thDynamicParam">蒸氣壓力 (MPa)</th>
+                                    <th class="p-3.5">給水溫度 (°C)</th>
+                                    <th class="p-3.5">巡檢人員</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inspectionHistoryBody" class="divide-y divide-slate-700/60 font-mono">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: 維修保養履歷 -->
+            <div id="tab-maintenance" class="tab-content hidden space-y-6">
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
+                    <h2 class="font-semibold text-slate-200 mb-4">維修與保養工單紀錄</h2>
+                    <p class="text-xs text-slate-400">提供完整全生命週期保養紀錄管理。</p>
+                </div>
+            </div>
+
+            <!-- TAB 4: 巡檢提醒與設定 -->
+            <div id="tab-reminders" class="tab-content hidden space-y-6">
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
+                    <h2 class="font-semibold text-slate-200 mb-4">智慧巡檢提醒與排程設定</h2>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // 設備列表
+        let boilers = [
+            { id: "B01", name: "#1 貫流式蒸氣鍋爐 (1.5 Ton/hr)", type: "steam", detail: "型號: SF-1500, 常用壓力: 0.8 MPa" },
+            { id: "B02", name: "#2 臥式火管鍋爐 (3.0 Ton/hr)", type: "steam", detail: "型號: SF-3000H, 常用壓力: 0.75 MPa" },
+            { id: "B03", name: "#1 專用高溫熱水鍋爐", type: "hotwater", detail: "型號: HW-5000, 出水設定溫度: 85 °C" }
+        ];
+
+        // 各設備歷史巡檢紀錄
+        let boilerRecords = {
+            "B01": [
+                { date: '07/17', flueTemp: 176.0, dynamicVal: 0.76, waterTemp: 56.0, inspector: '張工程師' },
+                { date: '07/18', flueTemp: 178.0, dynamicVal: 0.77, waterTemp: 57.0, inspector: '張工程師' },
+                { date: '07/19', flueTemp: 177.5, dynamicVal: 0.78, waterTemp: 58.0, inspector: '張工程師' },
+                { date: '07/20', flueTemp: 178.0, dynamicVal: 0.76, waterTemp: 57.5, inspector: '張工程師' },
+                { date: '07/21', flueTemp: 178.5, dynamicVal: 0.78, waterTemp: 58.0, inspector: '張工程師' }
+            ],
+            "B02": [
+                { date: '07/17', flueTemp: 185.0, dynamicVal: 0.72, waterTemp: 60.0, inspector: '張工程師' },
+                { date: '07/18', flueTemp: 186.0, dynamicVal: 0.73, waterTemp: 61.0, inspector: '張工程師' },
+                { date: '07/19', flueTemp: 184.0, dynamicVal: 0.72, waterTemp: 60.5, inspector: '張工程師' }
+            ],
+            "B03": [
+                { date: '07/17', flueTemp: 142.0, dynamicVal: 82.5, waterTemp: 45.0, inspector: '李工程師' },
+                { date: '07/18', flueTemp: 145.0, dynamicVal: 84.0, waterTemp: 46.0, inspector: '李工程師' },
+                { date: '07/19', flueTemp: 143.5, dynamicVal: 85.0, waterTemp: 46.5, inspector: '李工程師' },
+                { date: '07/20', flueTemp: 144.0, dynamicVal: 83.5, waterTemp: 45.5, inspector: '張工程師' },
+                { date: '07/21', flueTemp: 145.5, dynamicVal: 85.5, waterTemp: 47.0, inspector: '張工程師' }
+            ]
+        };
+
+        let selectedBoilerId = "B01";
+        let trendChart = null;
+
+        function renderBoilerOptions() {
+            const select = document.getElementById('leftBoilerSelect');
+            select.innerHTML = '';
+            boilers.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.id;
+                const typeName = b.type === 'hotwater' ? '[熱水鍋爐]' : '[蒸氣鍋爐]';
+                opt.innerText = `${typeName} ${b.name}`;
+                if (b.id === selectedBoilerId) opt.selected = true;
+                select.appendChild(opt);
+            });
+            updateCurrentBoilerUI();
+        }
+
+        function onBoilerChange() {
+            selectedBoilerId = document.getElementById('leftBoilerSelect').value;
+            updateCurrentBoilerUI();
+            renderHistoryTableAndChart();
+        }
+
+        function updateCurrentBoilerUI() {
+            const current = boilers.find(b => b.id === selectedBoilerId);
+            if (!current) return;
+
+            // 1. 同步 Header Title 與 左側規格描述
+            document.getElementById('headerBoilerTitle').innerText = current.name;
+            document.getElementById('leftBoilerDetailDisplay').innerText = current.detail || '無填寫規格資料';
+
+            // 2. 同步管理彈窗欄位
+            document.getElementById('editBoilerName').value = current.name;
+            document.getElementById('editBoilerType').value = current.type;
+            document.getElementById('editBoilerDetail').value = current.detail || '';
+
+            // 3. 取得該設備的最後一筆歷史紀錄（當作輸入框的參考底字 placeholder）
+            const records = boilerRecords[selectedBoilerId] || [];
+            const lastRecord = records.length > 0 ? records[records.length - 1] : null;
+
+            // 4. 動態切換標籤與設定 Placeholder 提示字
+            const badge = document.getElementById('headerBoilerBadge');
+            const dynamicLabel = document.getElementById('lblDynamicParam');
+            const thDynamic = document.getElementById('thDynamicParam');
+            const dynamicInput = document.getElementById('inputDynamicParam');
+
+            if (current.type === 'hotwater') {
+                badge.innerText = "熱水鍋爐";
+                badge.className = "text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium me-2";
+                dynamicLabel.innerText = "熱水出水溫度 (°C)";
+                if (thDynamic) thDynamic.innerText = "熱水溫度 (°C)";
+                dynamicInput.placeholder = lastRecord ? `前次: ${lastRecord.dynamicVal} °C` : "請輸入熱水溫度";
+            } else {
+                badge.innerText = "蒸氣鍋爐";
+                badge.className = "text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full font-medium me-2";
+                dynamicLabel.innerText = "蒸氣壓力 (MPa)";
+                if (thDynamic) thDynamic.innerText = "蒸氣壓力 (MPa)";
+                dynamicInput.placeholder = lastRecord ? `前次: ${lastRecord.dynamicVal} MPa` : "請輸入蒸氣壓力";
+            }
+
+            // 5. 清空輸入框數值與備註（避免把上一筆資料誤當成新資料儲存）
+            dynamicInput.value = "";
+            document.getElementById('inputFlueTemp').value = "";
+            document.getElementById('inputFlueTemp').placeholder = lastRecord ? `前次: ${lastRecord.flueTemp} °C` : "請輸入排煙溫度";
+            
+            document.getElementById('inputWaterTemp').value = "";
+            document.getElementById('inputWaterTemp').placeholder = lastRecord ? `前次: ${lastRecord.waterTemp} °C` : "請輸入給水溫度";
+
+            document.getElementById('inputHardness').value = "";
+            document.getElementById('inputNotes').value = "";
+        }
+
+        function toggleBoilerManager() {
+            document.getElementById('boilerManagerBox').classList.toggle('hidden');
+        }
+
+        function saveCurrentBoilerName() {
+            const newName = document.getElementById('editBoilerName').value.trim();
+            const newType = document.getElementById('editBoilerType').value;
+            const newDetail = document.getElementById('editBoilerDetail').value.trim();
+            
+            if (!newName) return alert("請輸入設備名稱！");
+            
+            const current = boilers.find(b => b.id === selectedBoilerId);
+            if (current) {
+                current.name = newName;
+                current.type = newType;
+                current.detail = newDetail;
+                renderBoilerOptions();
+                alert("✅ 設備資訊已成功修改！");
+            }
+        }
+
+        function addNewBoiler() {
+            const newName = document.getElementById('editBoilerName').value.trim();
+            const newType = document.getElementById('editBoilerType').value;
+            const newDetail = document.getElementById('editBoilerDetail').value.trim();
+            
+            if (!newName) return alert("請輸入新設備名稱！");
+            
+            const newId = "B" + String(boilers.length + 1).padStart(2, '0');
+            boilers.push({ 
+                id: newId, 
+                name: newName, 
+                type: newType, 
+                detail: newDetail || "暫無規格備註" 
+            });
+            boilerRecords[newId] = [];
+            selectedBoilerId = newId;
+            renderBoilerOptions();
+            alert("✅ 新設備建立完成！已自動切換至該設備。");
+        }
+
+        function toggleInspectorForm() {
+            document.getElementById('inspectorFormBox').classList.toggle('hidden');
+        }
+
+        function saveInspectorInfo() {
+            const name = document.getElementById('inputInspectorName').value.trim();
+            const dept = document.getElementById('inputInspectorDept').value.trim();
+            if (name) document.getElementById('inspectorName').innerText = name;
+            if (dept) document.getElementById('inspectorDept').innerText = dept;
+            document.getElementById('inspectorFormBox').classList.add('hidden');
+            alert("✅ 巡檢員資料已成功更新！");
+        }
+
+        function renderHistoryTableAndChart() {
+            const current = boilers.find(b => b.id === selectedBoilerId);
+            const records = boilerRecords[selectedBoilerId] || [];
+            const isHotWater = current && current.type === 'hotwater';
+
+            // 1. 更新歷史表格
+            const tbody = document.getElementById('inspectionHistoryBody');
+            tbody.innerHTML = '';
+
+            if (records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">尚無巡檢紀錄，請先填報巡檢資料。</td></tr>`;
+            } else {
+                records.slice().reverse().forEach(r => {
+                    const tr = document.createElement('tr');
+                    const unitStr = isHotWater ? '°C' : 'MPa';
+                    tr.className = "hover:bg-slate-800/50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="p-3.5 font-medium text-slate-200">${r.date}</td>
+                        <td class="p-3.5 text-amber-400 font-bold">${r.flueTemp} °C</td>
+                        <td class="p-3.5 text-sky-400 font-semibold">${r.dynamicVal} ${unitStr}</td>
+                        <td class="p-3.5 text-emerald-400 font-semibold">${r.waterTemp} °C</td>
+                        <td class="p-3.5 text-slate-300 font-sans">${r.inspector}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // 2. 更新趨勢圖表
+            const labels = records.map(r => r.date);
+            const flueTemps = records.map(r => r.flueTemp);
+            const waterTemps = records.map(r => r.waterTemp);
+            const dynamicVals = records.map(r => r.dynamicVal);
+            const dynamicLabelText = isHotWater ? '熱水溫度 (°C)' : '蒸氣壓力 (MPa)';
+
+            const chartDatasets = [
+                {
+                    label: '排煙溫度 (°C)',
+                    data: flueTemps,
+                    borderColor: '#f59e0b',
+                    backgroundColor: '#f59e0b',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    tension: 0.2
+                },
+                {
+                    label: '給水溫度 (°C)',
+                    data: waterTemps,
+                    borderColor: '#10b981',
+                    backgroundColor: '#10b981',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    tension: 0.2
+                },
+                {
+                    label: dynamicLabelText,
+                    data: dynamicVals,
+                    borderColor: '#38bdf8',
+                    backgroundColor: '#38bdf8',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    tension: 0.2
+                }
+            ];
+
+            if (trendChart) {
+                trendChart.data.labels = labels;
+                trendChart.data.datasets = chartDatasets;
+                trendChart.update();
+            } else {
+                const ctx = document.getElementById('inspectionTrendChart').getContext('2d');
+                trendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: chartDatasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { color: '#cbd5e1', font: { size: 11 }, boxWidth: 12 }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                                ticks: { color: '#94a3b8', font: { size: 10 } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                                ticks: { color: '#94a3b8', font: { size: 10 } }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-brand-600', 'text-white');
+                el.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-brand-600', 'text-white');
+                activeNav.classList.remove('text-slate-400');
+            }
+
+            if (tabId === 'trends') {
+                renderHistoryTableAndChart();
+            }
+        }
+
+        function submitInspection(e) {
+            e.preventDefault();
+            const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value);
+            const dynamicVal = parseFloat(document.getElementById('inputDynamicParam').value);
+            const waterTemp = parseFloat(document.getElementById('inputWaterTemp').value);
+            const currentInspector = document.getElementById('inspectorName').innerText;
+
+            const now = new Date();
+            const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+
+            if (!boilerRecords[selectedBoilerId]) {
+                boilerRecords[selectedBoilerId] = [];
+            }
+
+            boilerRecords[selectedBoilerId].push({
+                date: dateStr,
+                flueTemp: flueTemp,
+                dynamicVal: dynamicVal,
+                waterTemp: waterTemp,
+                inspector: currentInspector
+            });
+
+            alert("✅ 巡檢紀錄提交成功！數據已自動同步。");
+            updateCurrentBoilerUI(); // 送出後重新整理並更新 placeholder
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBoilerOptions();
+            renderHistoryTableAndChart();
+        });
+    </script>
+</body>
+</html>
