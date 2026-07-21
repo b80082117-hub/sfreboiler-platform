@@ -48,7 +48,7 @@
             </div>
 
             <!-- 左側設備選擇與管理區塊 -->
-            <div class="p-4 border-b border-slate-800/80 bg-slate-900/40 space-y-2">
+            <div class="p-4 border-b border-slate-800/80 bg-slate-900/40 space-y-2.5">
                 <div class="flex items-center justify-between">
                     <label for="leftBoilerSelect" class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                         <i class="fa-solid fa-industry text-sky-400"></i> 當前巡檢設備：
@@ -62,10 +62,21 @@
                 <select id="leftBoilerSelect" onchange="onBoilerChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-1 focus:ring-sky-500 focus:outline-none">
                 </select>
 
-                <!-- 設備新增/修改管理彈窗面板 -->
+                <!-- 新增：同步顯示選擇設備的詳細資訊卡片 -->
+                <div class="p-2.5 bg-slate-950/60 rounded-lg border border-slate-800 text-[11px] space-y-1">
+                    <div class="text-slate-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info text-sky-400 text-[10px]"></i>
+                        <span class="font-medium text-slate-300">設備規格與備註：</span>
+                    </div>
+                    <p id="leftBoilerDetailDisplay" class="text-slate-300 font-mono leading-relaxed pl-3.5 break-words">
+                        加載中...
+                    </p>
+                </div>
+
+                <!-- 設備新增/修改管理彈窗面板 (整合規格資料輸入) -->
                 <div id="boilerManagerBox" class="hidden p-3 mt-2 bg-slate-900 rounded-lg border border-sky-500/30 text-xs space-y-2">
                     <div class="font-bold text-slate-200 flex justify-between items-center border-b border-slate-800 pb-1">
-                        <span>設備項目編輯</span>
+                        <span>設備項目管理</span>
                         <button onclick="toggleBoilerManager()" class="text-slate-400 hover:text-white">✕</button>
                     </div>
                     <div>
@@ -78,6 +89,10 @@
                             <option value="steam">蒸氣鍋爐</option>
                             <option value="hotwater">熱水鍋爐</option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-0.5">設備規格 / 備註資訊：</label>
+                        <textarea id="editBoilerDetail" rows="2" placeholder="例: 型號: HW-5000, 出水設定溫度: 85 °C" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none"></textarea>
                     </div>
                     <div class="flex gap-2 pt-1">
                         <button onclick="saveCurrentBoilerName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-1 rounded text-[11px] font-medium">修改此設備</button>
@@ -160,20 +175,8 @@
 
             <!-- TAB 1: 巡檢資料填報 -->
             <div id="tab-inspection" class="tab-content space-y-6">
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-xs font-semibold text-slate-200 flex items-center gap-2">
-                            <i class="fa-solid fa-circle-info text-sky-400"></i> 設備詳細規格與備註資料 (動態輸入)
-                        </label>
-                        <button onclick="saveBoilerDetails()" class="text-[11px] bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded flex items-center gap-1">
-                            <i class="fa-solid fa-floppy-disk"></i> 儲存設備資料
-                        </button>
-                    </div>
-                    <textarea id="boilerDetailText" rows="2" placeholder="請輸入該設備的詳細規格、廠牌番號、放置位置或特別注意事項..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"></textarea>
-                </div>
-
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- 輸入表單 (使用 step="any" 解決有效值警告) -->
+                    <!-- 輸入表單 -->
                     <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/60 rounded-xl p-6">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
@@ -193,7 +196,6 @@
                                     <input type="number" step="any" id="inputFlueTemp" required value="178.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
                                 </div>
                                 <div>
-                                    <!-- 已修正為「給水溫度 (°C)」 -->
                                     <label class="block text-slate-300 mb-1">給水溫度 (°C)</label>
                                     <input type="number" step="any" id="inputWaterTemp" required value="58.0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
                                 </div>
@@ -252,7 +254,7 @@
 
             <!-- TAB 2: 巡檢歷史數據與趨勢圖表 -->
             <div id="tab-trends" class="tab-content hidden space-y-6">
-                <!-- 圖表容器高度縮小至 h-44 (176px)，支援多條數據曲線顯示 -->
+                <!-- 圖表容器 -->
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
                     <h2 class="font-semibold text-slate-200 mb-2 flex items-center gap-2 text-sm">
                         <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期巡檢數據綜合趨勢圖
@@ -307,7 +309,7 @@
     </main>
 
     <script>
-        // 設備列表
+        // 設備列表 (預設含細節與備註)
         let boilers = [
             { id: "B01", name: "#1 貫流式蒸氣鍋爐 (1.5 Ton/hr)", type: "steam", detail: "型號: SF-1500, 常用壓力: 0.8 MPa" },
             { id: "B02", name: "#2 臥式火管鍋爐 (3.0 Ton/hr)", type: "steam", detail: "型號: SF-3000H, 常用壓力: 0.75 MPa" },
@@ -364,11 +366,18 @@
             const current = boilers.find(b => b.id === selectedBoilerId);
             if (!current) return;
 
+            // 1. 同步 Header Title
             document.getElementById('headerBoilerTitle').innerText = current.name;
+            
+            // 2. 同步左側設備規格展示卡片
+            document.getElementById('leftBoilerDetailDisplay').innerText = current.detail || '無填寫規格資料';
+
+            // 3. 同步管理彈窗內的填報值
             document.getElementById('editBoilerName').value = current.name;
             document.getElementById('editBoilerType').value = current.type;
-            document.getElementById('boilerDetailText').value = current.detail || '';
+            document.getElementById('editBoilerDetail').value = current.detail || '';
 
+            // 4. 動態標籤調整 (蒸氣 vs 熱水)
             const badge = document.getElementById('headerBoilerBadge');
             const dynamicLabel = document.getElementById('lblDynamicParam');
             const thDynamic = document.getElementById('thDynamicParam');
@@ -396,37 +405,38 @@
         function saveCurrentBoilerName() {
             const newName = document.getElementById('editBoilerName').value.trim();
             const newType = document.getElementById('editBoilerType').value;
+            const newDetail = document.getElementById('editBoilerDetail').value.trim();
+            
             if (!newName) return alert("請輸入設備名稱！");
             
             const current = boilers.find(b => b.id === selectedBoilerId);
             if (current) {
                 current.name = newName;
                 current.type = newType;
+                current.detail = newDetail;
                 renderBoilerOptions();
-                alert("✅ 設備設定修改成功！");
+                alert("✅ 設備資訊已成功修改！");
             }
         }
 
         function addNewBoiler() {
             const newName = document.getElementById('editBoilerName').value.trim();
             const newType = document.getElementById('editBoilerType').value;
+            const newDetail = document.getElementById('editBoilerDetail').value.trim();
+            
             if (!newName) return alert("請輸入新設備名稱！");
             
             const newId = "B" + String(boilers.length + 1).padStart(2, '0');
-            boilers.push({ id: newId, name: newName, type: newType, detail: "新新增設備規格資料..." });
+            boilers.push({ 
+                id: newId, 
+                name: newName, 
+                type: newType, 
+                detail: newDetail || "暫無規格備註" 
+            });
             boilerRecords[newId] = [];
             selectedBoilerId = newId;
             renderBoilerOptions();
             alert("✅ 新設備建立完成！已自動切換至該設備。");
-        }
-
-        function saveBoilerDetails() {
-            const detailText = document.getElementById('boilerDetailText').value;
-            const current = boilers.find(b => b.id === selectedBoilerId);
-            if (current) {
-                current.detail = detailText;
-                alert("✅ 設備詳細規格與備註已儲存！");
-            }
         }
 
         function toggleInspectorForm() {
@@ -447,7 +457,7 @@
             const records = boilerRecords[selectedBoilerId] || [];
             const isHotWater = current && current.type === 'hotwater';
 
-            // 1. 更新對照表
+            // 1. 更新歷史對照表
             const tbody = document.getElementById('inspectionHistoryBody');
             tbody.innerHTML = '';
 
@@ -469,7 +479,7 @@
                 });
             }
 
-            // 2. 更新趨勢圖表 (多條曲線：排煙溫度 + 給水溫度 + 蒸氣壓力/熱水溫度)
+            // 2. 更新趨勢圖表
             const labels = records.map(r => r.date);
             const flueTemps = records.map(r => r.flueTemp);
             const waterTemps = records.map(r => r.waterTemp);
@@ -480,7 +490,7 @@
                 {
                     label: '排煙溫度 (°C)',
                     data: flueTemps,
-                    borderColor: '#f59e0b', // 琥珀黃
+                    borderColor: '#f59e0b',
                     backgroundColor: '#f59e0b',
                     borderWidth: 2,
                     pointRadius: 3,
@@ -489,7 +499,7 @@
                 {
                     label: '給水溫度 (°C)',
                     data: waterTemps,
-                    borderColor: '#10b981', // 翡翠綠
+                    borderColor: '#10b981',
                     backgroundColor: '#10b981',
                     borderWidth: 2,
                     pointRadius: 3,
@@ -498,7 +508,7 @@
                 {
                     label: dynamicLabelText,
                     data: dynamicVals,
-                    borderColor: '#38bdf8', // 天藍
+                    borderColor: '#38bdf8',
                     backgroundColor: '#38bdf8',
                     borderWidth: 2,
                     pointRadius: 3,
