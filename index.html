@@ -319,7 +319,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: 維修保養履歷 (完整強化版) -->
+            <!-- TAB 3: 維修保養履歷 (含照片上傳與對照功能) -->
             <div id="tab-maintenance" class="tab-content hidden space-y-6">
                 
                 <!-- 1. 頂部關鍵數據指標卡片 (KPI Summary) -->
@@ -365,13 +365,13 @@
                     </div>
                 </div>
 
-                <!-- 2. 新增保養工單表單區塊 -->
+                <!-- 2. 新增保養工單表單區塊 (含兩張照片上傳) -->
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
                         <h2 class="font-bold text-slate-100 flex items-center gap-2 text-base">
                             <i class="fa-solid fa-square-plus text-amber-400"></i> 新增維修保養工單
                         </h2>
-                        <span class="text-xs text-slate-400">全生命週期檔案紀錄</span>
+                        <span class="text-xs text-slate-400">支援維修前後照片上傳與備份</span>
                     </div>
 
                     <form onsubmit="submitMaintenance(event)" class="space-y-4">
@@ -418,6 +418,37 @@
                             </div>
                         </div>
 
+                        <!-- 📸 新增：維修前與維修後照片上傳區塊 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2 border-t border-slate-700/50">
+                            <!-- 維修前照片 -->
+                            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
+                                <label class="block text-amber-400 font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-camera"></i> 維修前照片 (Before)
+                                </label>
+                                <input type="file" id="maintPhotoBeforeInput" accept="image/*" onchange="previewImage(this, 'previewBeforeImg')" class="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-300 hover:file:bg-slate-700 cursor-pointer">
+                                <div class="w-full h-24 bg-slate-950 rounded flex items-center justify-center overflow-hidden border border-slate-800 relative">
+                                    <img id="previewBeforeImg" class="hidden object-cover w-full h-full" alt="維修前預覽">
+                                    <span id="previewBeforePlaceholder" class="text-slate-500 text-[11px] flex items-center gap-1">
+                                        <i class="fa-regular fa-image"></i> 尚未上傳照片
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- 維修後照片 -->
+                            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
+                                <label class="block text-emerald-400 font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-camera-retro"></i> 維修後照片 (After)
+                                </label>
+                                <input type="file" id="maintPhotoAfterInput" accept="image/*" onchange="previewImage(this, 'previewAfterImg')" class="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-emerald-300 hover:file:bg-slate-700 cursor-pointer">
+                                <div class="w-full h-24 bg-slate-950 rounded flex items-center justify-center overflow-hidden border border-slate-800 relative">
+                                    <img id="previewAfterImg" class="hidden object-cover w-full h-full" alt="維修後預覽">
+                                    <span id="previewAfterPlaceholder" class="text-slate-500 text-[11px] flex items-center gap-1">
+                                        <i class="fa-regular fa-image"></i> 尚未上傳照片
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end pt-2">
                             <button type="submit" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-xs flex items-center gap-2 shadow-lg transition-colors">
                                 <i class="fa-solid fa-plus"></i> 建立保養工單
@@ -426,13 +457,13 @@
                     </form>
                 </div>
 
-                <!-- 3. 維修保養歷史紀錄對照表 -->
+                <!-- 3. 維修保養歷史紀錄對照表 (含圖片對照) -->
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-slate-100 text-base flex items-center gap-2">
                             <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> 保養與維修履歷對照表
                         </h3>
-                        <span class="text-xs text-slate-400">數據已與當前設備連結</span>
+                        <span class="text-xs text-slate-400">點擊圖片即可開放大圖觀看</span>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -442,6 +473,7 @@
                                     <th class="p-3.5">保養日期</th>
                                     <th class="p-3.5">類別</th>
                                     <th class="p-3.5">保養項目與說明</th>
+                                    <th class="p-3.5">維修前/後對照照片</th>
                                     <th class="p-3.5">狀態</th>
                                     <th class="p-3.5">負責技師/廠商</th>
                                     <th class="p-3.5">費用 (NTD)</th>
@@ -466,6 +498,24 @@
         </div>
     </main>
 
+    <!-- 照片放大檢視 Modal 面板 -->
+    <div id="imageModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImageModal()">
+        <div class="relative bg-slate-900 border border-slate-700 rounded-xl p-4 max-w-3xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
+            <button onclick="closeImageModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center">✕</button>
+            <h4 id="modalImageTitle" class="text-sm font-bold text-amber-400 mb-3">維修照片對照大圖</h4>
+            <div class="flex gap-4 overflow-auto justify-center max-h-[70vh]">
+                <div class="text-center">
+                    <span class="block text-xs font-bold text-amber-400 mb-1">維修前 (Before)</span>
+                    <img id="modalImgBefore" class="max-h-[60vh] rounded border border-slate-700 object-contain" src="" alt="維修前">
+                </div>
+                <div class="text-center">
+                    <span class="block text-xs font-bold text-emerald-400 mb-1">維修後 (After)</span>
+                    <img id="modalImgAfter" class="max-h-[60vh] rounded border border-slate-700 object-contain" src="" alt="維修後">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript 邏輯區 -->
     <script>
         let boilers = [
@@ -487,17 +537,24 @@
             ]
         };
 
-        // 維修保養模擬資料 (已連動設備)
+        // 模擬維修前與維修後的預設圖檔 Base64 / URL
+        const sampleBeforeImg = "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300&auto=format&fit=crop&q=60";
+        const sampleAfterImg = "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=300&auto=format&fit=crop&q=60";
+
+        // 維修保養模擬資料 (包含維修前後照片)
         let maintenanceRecords = {
             "B01": [
-                { date: "2026-07-15", type: "定期保養", title: "燃燒機噴嘴清洗與軟水系統鹽錠補充", status: "已完成", tech: "碩豐工程 - 陳技師", cost: 3500, notes: "系統運轉正常，軟水硬度降至 10 ppm" },
-                { date: "2026-06-10", type: "零件更換", title: "給水幫浦高壓密封墊圈更換", status: "已完成", tech: "碩豐工程 - 王技師", cost: 2800, notes: "排除微幅洩漏問題" },
-                { date: "2026-07-25", type: "定期保養", title: "月度鍋爐內部積碳檢查與水位計校正", status: "處理中", tech: "廠區維護組", cost: 0, notes: "已安排下週排空作業" }
+                { date: "2026-07-15", type: "定期保養", title: "燃燒機噴嘴清洗與軟水系統鹽錠補充", status: "已完成", tech: "碩豐工程 - 陳技師", cost: 3500, notes: "系統運轉正常，軟水硬度降至 10 ppm", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg },
+                { date: "2026-06-10", type: "零件更換", title: "給水幫浦高壓密封墊圈更換", status: "已完成", tech: "碩豐工程 - 王技師", cost: 2800, notes: "排除微幅洩漏問題", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg },
+                { date: "2026-07-25", type: "定期保養", title: "月度鍋爐內部積碳檢查與水位計校正", status: "處理中", tech: "廠區維護組", cost: 0, notes: "已安排下週排空作業", photoBefore: null, photoAfter: null }
             ],
             "B02": [
-                { date: "2026-05-20", type: "年度大修", title: "安全閥壓力校驗與整體管路耐壓測試", status: "已完成", tech: "原廠第三方檢驗所", cost: 18000, notes: "取得安檢合格證書" }
+                { date: "2026-05-20", type: "年度大修", title: "安全閥壓力校驗與整體管路耐壓測試", status: "已完成", tech: "原廠第三方檢驗所", cost: 18000, notes: "取得安檢合格證書", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg }
             ]
         };
+
+        let tempPhotoBefore = null;
+        let tempPhotoAfter = null;
 
         let selectedBoilerId = "B01";
         let trendChart = null;
@@ -570,7 +627,30 @@
             checkRealtimeHealth();
         }
 
-        // 渲染維修保養履歷對照表與統計卡片
+        // 上傳照片即時轉碼與預覽
+        function previewImage(input, imgElementId) {
+            const file = input.files[0];
+            const imgEl = document.getElementById(imgElementId);
+            const placeholderEl = document.getElementById(imgElementId === 'previewBeforeImg' ? 'previewBeforePlaceholder' : 'previewAfterPlaceholder');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imgEl.src = e.target.result;
+                    imgEl.classList.remove('hidden');
+                    if (placeholderEl) placeholderEl.classList.add('hidden');
+
+                    if (imgElementId === 'previewBeforeImg') {
+                        tempPhotoBefore = e.target.result;
+                    } else {
+                        tempPhotoAfter = e.target.result;
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 渲染維修保養履歷對照表 (含圖片欄位)
         function renderMaintenanceTable() {
             const list = maintenanceRecords[selectedBoilerId] || [];
             const tbody = document.getElementById('maintenanceHistoryBody');
@@ -583,7 +663,7 @@
             let totalCost = 0;
 
             if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">此設備尚無維修保養紀錄。</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">此設備尚無維修保養紀錄。</td></tr>';
             } else {
                 list.slice().reverse().forEach(function(item) {
                     if (item.status === '已完成') completed++;
@@ -599,12 +679,26 @@
                         statusBadge = '<span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px]">待派工</span>';
                     }
 
+                    // 照片顯示區塊 HTML
+                    let photoHTML = '<span class="text-slate-500 text-[10px]">無照片</span>';
+                    if (item.photoBefore || item.photoAfter) {
+                        const beforeSrc = item.photoBefore || item.photoAfter;
+                        const afterSrc = item.photoAfter || item.photoBefore;
+                        photoHTML = `
+                            <div class="flex items-center gap-1.5 cursor-pointer group" onclick="openImageModal('${beforeSrc}', '${afterSrc}', '${item.title}')">
+                                ${item.photoBefore ? `<img src="${item.photoBefore}" class="w-8 h-8 rounded border border-amber-500/50 object-cover group-hover:scale-105 transition-transform" title="點擊看大圖(維修前)">` : ''}
+                                ${item.photoAfter ? `<img src="${item.photoAfter}" class="w-8 h-8 rounded border border-emerald-500/50 object-cover group-hover:scale-105 transition-transform" title="點擊看大圖(維修後)">` : ''}
+                            </div>
+                        `;
+                    }
+
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-800/50 transition-colors";
                     tr.innerHTML = 
                         '<td class="p-3.5 text-slate-200 font-medium">' + item.date + '</td>' +
                         '<td class="p-3.5 text-sky-400 font-sans font-medium">' + item.type + '</td>' +
                         '<td class="p-3.5 text-slate-100 font-sans font-bold">' + item.title + '</td>' +
+                        '<td class="p-3.5 font-sans">' + photoHTML + '</td>' +
                         '<td class="p-3.5 font-sans">' + statusBadge + '</td>' +
                         '<td class="p-3.5 text-slate-300 font-sans">' + (item.tech || '-') + '</td>' +
                         '<td class="p-3.5 text-purple-300 font-bold">$ ' + (item.cost ? Number(item.cost).toLocaleString() : '0') + '</td>' +
@@ -619,6 +713,25 @@
             document.getElementById('maintPendingCount').innerText = pending;
             document.getElementById('maintCompletedCount').innerText = completed;
             document.getElementById('maintTotalCost').innerText = '$ ' + totalCost.toLocaleString();
+        }
+
+        // 打開與關閉圖片 Modal 放大預覽
+        function openImageModal(beforeSrc, afterSrc, title) {
+            document.getElementById('modalImageTitle').innerText = title + " - 照片對照";
+            const beforeImg = document.getElementById('modalImgBefore');
+            const afterImg = document.getElementById('modalImgAfter');
+
+            if (beforeSrc) { beforeImg.src = beforeSrc; beforeImg.parentElement.classList.remove('hidden'); }
+            else { beforeImg.parentElement.classList.add('hidden'); }
+
+            if (afterSrc) { afterImg.src = afterSrc; afterImg.parentElement.classList.remove('hidden'); }
+            else { afterImg.parentElement.classList.add('hidden'); }
+
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
         }
 
         function submitMaintenance(e) {
@@ -644,10 +757,22 @@
                 status: status,
                 tech: tech,
                 cost: cost,
-                notes: notes
+                notes: notes,
+                photoBefore: tempPhotoBefore,
+                photoAfter: tempPhotoAfter
             });
 
-            alert("✅ 保養維修工單已成功建立！");
+            // 清空圖片暫存與預覽
+            tempPhotoBefore = null;
+            tempPhotoAfter = null;
+            document.getElementById('previewBeforeImg').classList.add('hidden');
+            document.getElementById('previewAfterImg').classList.add('hidden');
+            document.getElementById('previewBeforePlaceholder').classList.remove('hidden');
+            document.getElementById('previewAfterPlaceholder').classList.remove('hidden');
+            document.getElementById('maintPhotoBeforeInput').value = '';
+            document.getElementById('maintPhotoAfterInput').value = '';
+
+            alert("✅ 保養維修工單已成功建立（包含照片）！");
             renderMaintenanceTable();
         }
 
