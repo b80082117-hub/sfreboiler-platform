@@ -36,10 +36,10 @@
     <!-- 側邊導覽列 -->
     <aside class="w-72 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0">
         <div class="overflow-y-auto">
-            <!-- Logo 區塊 -->
+            <!-- Logo 區塊 (已移除模糊損壞圖片，改用內建 Vector 圖示) -->
             <div class="h-16 flex items-center px-4 border-b border-slate-800 bg-slate-900/50 gap-3">
-                <div class="bg-white/90 p-1 rounded">
-                    <img src="https://i.imgur.com/8QZ3X1s.png" alt="sfre logo" class="h-7 object-contain">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-sky-500/20">
+                    <i class="fa-solid fa-fire-flame-curved text-lg"></i>
                 </div>
                 <div>
                     <h1 class="font-bold text-sm tracking-wide text-white">碩豐熱能</h1>
@@ -60,10 +60,9 @@
                 
                 <!-- 設備選單 -->
                 <select id="leftBoilerSelect" onchange="onBoilerChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-1 focus:ring-sky-500 focus:outline-none">
-                    <!-- 動態由 JavaScript 生成 -->
                 </select>
 
-                <!-- 設備新增/修改管理彈窗面板 (預設隱藏) -->
+                <!-- 設備新增/修改管理彈窗面板 -->
                 <div id="boilerManagerBox" class="hidden p-3 mt-2 bg-slate-900 rounded-lg border border-sky-500/30 text-xs space-y-2">
                     <div class="font-bold text-slate-200 flex justify-between items-center border-b border-slate-800 pb-1">
                         <span>設備項目編輯</span>
@@ -97,14 +96,34 @@
             </nav>
         </div>
 
-        <!-- 底部使用者資訊 -->
-        <div class="p-4 border-t border-slate-800 bg-slate-900/30">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-200">巡診</div>
-                <div class="text-xs">
-                    <p class="text-white font-medium">巡檢員：張工程師</p>
-                    <p class="text-slate-400 text-[10px]">廠區維護組</p>
+        <!-- 底部巡檢員資訊 (已改為可自己填寫/編輯機制) -->
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-sky-600/30 border border-sky-500/50 flex items-center justify-center text-xs font-bold text-sky-300">巡</div>
+                    <div class="text-xs">
+                        <p class="text-white font-medium flex items-center gap-1">
+                            <span id="inspectorName">張工程師</span>
+                        </p>
+                        <p class="text-slate-400 text-[10px]" id="inspectorDept">廠區維護組</p>
+                    </div>
                 </div>
+                <button onclick="toggleInspectorForm()" class="text-slate-400 hover:text-sky-400 text-xs p-1" title="修改巡檢員姓名">
+                    <i class="fa-solid fa-user-pen"></i>
+                </button>
+            </div>
+
+            <!-- 修改巡檢員小表單 -->
+            <div id="inspectorFormBox" class="hidden mt-3 pt-2 border-t border-slate-800 space-y-2 text-xs">
+                <div>
+                    <label class="block text-[10px] text-slate-400">巡檢員姓名：</label>
+                    <input type="text" id="inputInspectorName" value="張工程師" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-slate-100 text-xs">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400">所屬部門/組別：</label>
+                    <input type="text" id="inputInspectorDept" value="廠區維護組" class="w-full bg-slate-800 border border-slate-700 rounded p-1 text-slate-100 text-xs">
+                </div>
+                <button onclick="saveInspectorInfo()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-1 rounded text-[11px]">儲存巡檢員資料</button>
             </div>
         </div>
     </aside>
@@ -226,14 +245,35 @@
                 </div>
             </div>
 
-            <!-- TAB 2: 巡檢歷史數據與趨勢圖表 -->
+            <!-- TAB 2: 巡檢歷史數據與趨勢圖表 (已修復圖表遮擋問題與資料動態同步) -->
             <div id="tab-trends" class="tab-content hidden space-y-6">
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
                     <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期巡檢數據趨勢
                     </h2>
-                    <div class="h-72">
+                    <div class="relative w-full h-80">
                         <canvas id="inspectionTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 歷史巡檢數據與表格 (完全與曲線資料一致) -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
+                    <h3 class="font-semibold text-slate-200 mb-3 text-sm">歷史巡檢數據對照表</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900/80 text-slate-400 border-b border-slate-700">
+                                <tr>
+                                    <th class="p-2.5">巡檢日期</th>
+                                    <th class="p-2.5">排煙溫度 (°C)</th>
+                                    <th class="p-2.5">蒸氣壓力 (MPa)</th>
+                                    <th class="p-2.5">給水溫度 (°C)</th>
+                                    <th class="p-2.5">巡檢人員</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inspectionHistoryBody" class="divide-y divide-slate-700/50">
+                                <!-- 由 JavaScript 動態生成對應資料 -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -257,13 +297,23 @@
     </main>
 
     <script>
-        // 設備資料庫與細節
+        // 共享動態巡檢歷史資料 (確保圖表與表格數據完全一致)
+        let inspectionRecords = [
+            { date: '07/16', flueTemp: 175.0, pressure: 0.76, waterTemp: 56.0, inspector: '張工程師' },
+            { date: '07/17', flueTemp: 176.0, pressure: 0.77, waterTemp: 57.0, inspector: '張工程師' },
+            { date: '07/18', flueTemp: 178.0, pressure: 0.78, waterTemp: 58.0, inspector: '張工程師' },
+            { date: '07/19', flueTemp: 177.0, pressure: 0.76, waterTemp: 57.5, inspector: '張工程師' },
+            { date: '07/20', flueTemp: 177.0, pressure: 0.77, waterTemp: 58.0, inspector: '張工程師' }
+        ];
+
+        // 設備資料庫
         let boilers = [
             { id: "B01", name: "#1 貫流式蒸氣鍋爐 (1.5 Ton/hr)", detail: "型號: SF-1500, 安裝日期: 2024-03, 常用壓力: 0.8 MPa" },
             { id: "B02", name: "#2 臥式火管鍋爐 (3.0 Ton/hr)", detail: "型號: SF-3000H, 安裝日期: 2023-11, 常用壓力: 0.75 MPa" }
         ];
 
         let selectedBoilerId = "B01";
+        let trendChart = null;
 
         function renderBoilerOptions() {
             const select = document.getElementById('leftBoilerSelect');
@@ -326,6 +376,85 @@
             }
         }
 
+        // 巡檢員編輯功能
+        function toggleInspectorForm() {
+            document.getElementById('inspectorFormBox').classList.toggle('hidden');
+        }
+
+        function saveInspectorInfo() {
+            const name = document.getElementById('inputInspectorName').value.trim();
+            const dept = document.getElementById('inputInspectorDept').value.trim();
+            if (name) document.getElementById('inspectorName').innerText = name;
+            if (dept) document.getElementById('inspectorDept').innerText = dept;
+            document.getElementById('inspectorFormBox').classList.add('hidden');
+            alert("✅ 巡檢員資料已成功更新！");
+        }
+
+        function renderHistoryTableAndChart() {
+            // 更新歷史表格
+            const tbody = document.getElementById('inspectionHistoryBody');
+            tbody.innerHTML = '';
+            inspectionRecords.slice().reverse().forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 font-medium text-slate-200">${r.date}</td>
+                    <td class="p-2.5 text-amber-400 font-bold">${r.flueTemp} °C</td>
+                    <td class="p-2.5">${r.pressure} MPa</td>
+                    <td class="p-2.5">${r.waterTemp} °C</td>
+                    <td class="p-2.5 text-slate-400">${r.inspector}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 更新或初始化圖表
+            const labels = inspectionRecords.map(r => r.date);
+            const flueTemps = inspectionRecords.map(r => r.flueTemp);
+
+            if (trendChart) {
+                trendChart.data.labels = labels;
+                trendChart.data.datasets[0].data = flueTemps;
+                trendChart.update();
+            } else {
+                const ctx = document.getElementById('inspectionTrendChart').getContext('2d');
+                trendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '排煙溫度 (°C)',
+                            data: flueTemps,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#f59e0b',
+                            pointRadius: 5,
+                            tension: 0.2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#cbd5e1', font: { size: 12 } }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                                ticks: { color: '#94a3b8' }
+                            },
+                            y: {
+                                grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                                ticks: { color: '#94a3b8' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => {
@@ -339,29 +468,38 @@
                 activeNav.classList.add('bg-brand-600', 'text-white');
                 activeNav.classList.remove('text-slate-400');
             }
+
+            if (tabId === 'trends') {
+                renderHistoryTableAndChart();
+            }
         }
 
         function submitInspection(e) {
             e.preventDefault();
-            alert("✅ 巡檢紀錄提交成功！");
+            const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value);
+            const pressure = parseFloat(document.getElementById('inputPressure').value);
+            const waterTemp = parseFloat(document.getElementById('inputWaterTemp').value);
+            const currentInspector = document.getElementById('inspectorName').innerText;
+
+            const now = new Date();
+            const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+
+            inspectionRecords.push({
+                date: dateStr,
+                flueTemp: flueTemp,
+                pressure: pressure,
+                waterTemp: waterTemp,
+                inspector: currentInspector
+            });
+
+            if (inspectionRecords.length > 8) inspectionRecords.shift();
+
+            alert("✅ 巡檢紀錄提交成功！已同步至對照表與趨勢圖。");
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             renderBoilerOptions();
-            
-            const ctx = document.getElementById('inspectionTrendChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['07/16', '07/17', '07/18', '07/19', '07/20'],
-                    datasets: [{
-                        label: '排煙溫度 (°C)',
-                        data: [175, 176, 178, 177, 177],
-                        borderColor: '#f59e0b'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            renderHistoryTableAndChart();
         });
     </script>
 </body>
