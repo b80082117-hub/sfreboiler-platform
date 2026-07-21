@@ -36,7 +36,7 @@
     <!-- 手機版側邊欄遮罩 -->
     <div id="mobileBackdrop" class="hidden fixed inset-0 bg-black/60 z-30 lg:hidden" onclick="toggleSidebar()"></div>
 
-    <!-- 側邊導覽列 (支援手機版抽屜滑出機制) -->
+    <!-- 側邊導覽列 -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
         <div class="overflow-y-auto">
             <!-- Logo 區塊 -->
@@ -50,7 +50,6 @@
                         <p class="text-[10px] text-slate-400">巡檢與履歷管理平台</p>
                     </div>
                 </div>
-                <!-- 手機版關閉側欄按鈕 -->
                 <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-2">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
@@ -67,11 +66,9 @@
                     </button>
                 </div>
                 
-                <!-- 設備選單 -->
                 <select id="leftBoilerSelect" onchange="onBoilerChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-1 focus:ring-sky-500 focus:outline-none">
                 </select>
 
-                <!-- 同步顯示選擇設備的詳細資訊卡片 -->
                 <div class="p-2.5 bg-slate-950/60 rounded-lg border border-slate-800 text-[11px] space-y-1">
                     <div class="text-slate-400 flex items-center gap-1">
                         <i class="fa-solid fa-circle-info text-sky-400 text-[10px]"></i>
@@ -82,7 +79,7 @@
                     </p>
                 </div>
 
-                <!-- 設備新增/修改管理彈窗面板 -->
+                <!-- 設備新增/修改彈窗 -->
                 <div id="boilerManagerBox" class="hidden p-3 mt-2 bg-slate-900 rounded-lg border border-sky-500/30 text-xs space-y-2">
                     <div class="font-bold text-slate-200 flex justify-between items-center border-b border-slate-800 pb-1">
                         <span>設備項目管理</span>
@@ -161,10 +158,9 @@
     <!-- 主要內容區塊 -->
     <main class="flex-1 flex flex-col overflow-hidden bg-slate-900 w-full min-w-0">
         
-        <!-- 頂部 Header & 巡檢提醒 Banner -->
+        <!-- Header -->
         <header class="border-b border-slate-800 bg-slate-950/40 px-4 lg:px-6 py-3 shrink-0 flex items-center justify-between gap-2">
             <div class="flex items-center gap-3">
-                <!-- 手機版展開選單按鈕 -->
                 <button onclick="toggleSidebar()" class="lg:hidden text-slate-300 hover:text-white p-1.5 rounded bg-slate-800 border border-slate-700">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>
@@ -193,7 +189,6 @@
             <div id="tab-inspection" class="tab-content space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                     
-                    <!-- 輸入表單 -->
                     <div class="lg:col-span-4 bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
                         <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-700">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2 text-base">
@@ -248,7 +243,7 @@
                         </form>
                     </div>
 
-                    <!-- AI 即時診斷卡片 -->
+                    <!-- AI 巡檢診斷 -->
                     <div class="lg:col-span-1 bg-gradient-to-b from-slate-800/90 to-slate-900/90 border border-purple-500/30 rounded-xl p-4 shadow-xl flex flex-col justify-between relative overflow-hidden">
                         <div class="absolute -right-10 -top-10 w-28 h-28 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -337,8 +332,7 @@
 
             <!-- TAB 3: 維修保養履歷 -->
             <div id="tab-maintenance" class="tab-content hidden space-y-6">
-                
-                <!-- 1. 頂部關鍵數據指標卡片 (KPI Summary) -->
+                <!-- 1. KPI 數據卡片 -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                     <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 lg:p-4 flex items-center gap-3">
                         <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg lg:text-xl shrink-0">
@@ -381,7 +375,7 @@
                     </div>
                 </div>
 
-                <!-- 2. 新增保養工單表單區塊 (含照片上傳) -->
+                <!-- 2. 新增保養工單表單 -->
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-lg">
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
                         <h2 class="font-bold text-slate-100 flex items-center gap-2 text-sm sm:text-base">
@@ -434,14 +428,14 @@
                             </div>
                         </div>
 
-                        <!-- 📸 維修前與維修後照片上傳區塊 -->
+                        <!-- 照片上傳區塊 -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2 border-t border-slate-700/50">
-                            <!-- 維修前照片 -->
+                            <!-- 維修前 -->
                             <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
                                 <label class="block text-amber-400 font-bold flex items-center gap-1.5">
                                     <i class="fa-solid fa-camera"></i> 維修前照片 (Before)
                                 </label>
-                                <input type="file" id="maintPhotoBeforeInput" accept="image/*" onchange="previewImage(this, 'previewBeforeImg')" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-300 hover:file:bg-slate-700 cursor-pointer">
+                                <input type="file" id="maintPhotoBeforeInput" accept="image/*" onchange="previewImage(this, 'previewBeforeImg', 'previewBeforePlaceholder')" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-300 hover:file:bg-slate-700 cursor-pointer">
                                 <div class="w-full h-24 bg-slate-950 rounded flex items-center justify-center overflow-hidden border border-slate-800 relative">
                                     <img id="previewBeforeImg" class="hidden object-contain w-full h-full" alt="維修前預覽">
                                     <span id="previewBeforePlaceholder" class="text-slate-500 text-[11px] flex items-center gap-1">
@@ -450,12 +444,12 @@
                                 </div>
                             </div>
 
-                            <!-- 維修後照片 -->
+                            <!-- 維修後 -->
                             <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
                                 <label class="block text-emerald-400 font-bold flex items-center gap-1.5">
                                     <i class="fa-solid fa-camera-retro"></i> 維修後照片 (After)
                                 </label>
-                                <input type="file" id="maintPhotoAfterInput" accept="image/*" onchange="previewImage(this, 'previewAfterImg')" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-emerald-300 hover:file:bg-slate-700 cursor-pointer">
+                                <input type="file" id="maintPhotoAfterInput" accept="image/*" onchange="previewImage(this, 'previewAfterImg', 'previewAfterPlaceholder')" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-emerald-300 hover:file:bg-slate-700 cursor-pointer">
                                 <div class="w-full h-24 bg-slate-950 rounded flex items-center justify-center overflow-hidden border border-slate-800 relative">
                                     <img id="previewAfterImg" class="hidden object-contain w-full h-full" alt="維修後預覽">
                                     <span id="previewAfterPlaceholder" class="text-slate-500 text-[11px] flex items-center gap-1">
@@ -465,322 +459,396 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end pt-2">
-                            <button type="submit" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-xs flex items-center justify-center gap-2 shadow-lg transition-colors">
-                                <i class="fa-solid fa-plus"></i> 建立保養工單
-                            </button>
-                        </div>
+                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-lg transition-all text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20">
+                            <i class="fa-solid fa-plus"></i> 建立維修保養工單
+                        </button>
                     </form>
                 </div>
 
-                <!-- 3. 維修保養歷史紀錄對照表 (含圖片縮圖對照) -->
+                <!-- 3. 保養歷史對照表 -->
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-lg">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-100 text-sm sm:text-base flex items-center gap-2">
-                            <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> 保養與維修履歷對照表
-                        </h3>
-                        <span class="text-xs text-slate-400 hidden sm:inline">點擊圖片即可開放大圖觀看</span>
-                    </div>
-
+                    <h3 class="font-bold text-slate-100 text-sm sm:text-base mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> 維修保養歷史紀錄
+                    </h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs sm:text-sm text-slate-300 min-w-[700px]">
-                            <thead class="bg-slate-950/80 text-slate-300 border-b border-slate-700 uppercase font-semibold text-xs">
+                            <thead class="bg-slate-950/80 text-slate-300 border-b border-slate-700 uppercase font-semibold">
                                 <tr>
-                                    <th class="p-3">保養日期</th>
+                                    <th class="p-3">日期</th>
                                     <th class="p-3">類別</th>
-                                    <th class="p-3">保養項目與說明</th>
-                                    <th class="p-3">維修前後照片</th>
+                                    <th class="p-3">保養項目</th>
                                     <th class="p-3">狀態</th>
-                                    <th class="p-3">負責技師/廠商</th>
-                                    <th class="p-3">費用 (NTD)</th>
-                                    <th class="p-3">備註</th>
+                                    <th class="p-3">技師/廠商</th>
+                                    <th class="p-3">費用</th>
+                                    <th class="p-3">前後對照照片</th>
+                                    <th class="p-3 text-center">操作</th>
                                 </tr>
                             </thead>
-                            <tbody id="maintenanceHistoryBody" class="divide-y divide-slate-700/60 font-mono text-xs">
+                            <tbody id="maintenanceHistoryBody" class="divide-y divide-slate-700/60 font-mono">
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
 
-            <!-- TAB 4: 巡檢提醒與設定 -->
+            <!-- TAB 4: 巡檢提醒與排程 -->
             <div id="tab-reminders" class="tab-content hidden space-y-6">
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
-                    <h2 class="font-semibold text-slate-200 mb-4">智慧巡檢提醒與排程設定</h2>
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg space-y-4">
+                    <h2 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-bell text-purple-400"></i> 巡檢提醒與定期排程
+                    </h2>
+                    <p class="text-xs text-slate-400">設定定時提醒，確保班別與週期巡檢零漏報。</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
+                        <div class="p-4 bg-slate-900 rounded-lg border border-slate-700 space-y-2">
+                            <h3 class="font-bold text-sky-400 text-sm">每日巡檢時間</h3>
+                            <p class="text-slate-300">建議時段：每班次開工前（08:00 / 16:00 / 00:00）</p>
+                            <span class="inline-block bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] border border-emerald-500/30">系統已啟用推播提醒</span>
+                        </div>
+                        <div class="p-4 bg-slate-900 rounded-lg border border-slate-700 space-y-2">
+                            <h3 class="font-bold text-purple-400 text-sm">定期大修排程</h3>
+                            <p class="text-slate-300">下一次法定定檢：2026-11-15（剩餘 117 天）</p>
+                            <span class="inline-block bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-[10px] border border-purple-500/30">排程進行中</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <!-- 照片放大檢視 Modal 面板 (已加入強化的直/橫圖防變形對照容器) -->
-    <div id="imageModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" onclick="closeImageModal()">
-        <div class="relative bg-slate-900 border border-slate-700 rounded-xl p-4 sm:p-5 max-w-4xl w-full max-h-[90vh] flex flex-col items-center shadow-2xl" onclick="event.stopPropagation()">
-            <!-- 關閉按鈕 -->
-            <button onclick="closeImageModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-base font-bold bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors">✕</button>
-            
-            <!-- 標題 -->
-            <h4 id="modalImageTitle" class="text-xs sm:text-sm font-bold text-amber-400 mb-4 text-center pr-6">維修照片對照大圖</h4>
-            
-            <!-- 照片對照區域 (使用 Grid 控制直橫照片不變形) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full overflow-y-auto max-h-[75vh]">
-                <!-- 維修前 (Before) -->
-                <div id="containerBefore" class="flex flex-col items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <span class="text-xs font-bold text-amber-400 mb-2 flex items-center gap-1">
-                        <i class="fa-solid fa-camera"></i> 維修前 (Before)
-                    </span>
-                    <div class="w-full h-56 sm:h-72 md:h-80 bg-slate-900 rounded overflow-hidden flex items-center justify-center border border-slate-800">
-                        <img id="modalImgBefore" class="w-full h-full object-contain" src="" alt="維修前">
-                    </div>
-                </div>
-
-                <!-- 維修後 (After) -->
-                <div id="containerAfter" class="flex flex-col items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <span class="text-xs font-bold text-emerald-400 mb-2 flex items-center gap-1">
-                        <i class="fa-solid fa-camera-retro"></i> 維修後 (After)
-                    </span>
-                    <div class="w-full h-56 sm:h-72 md:h-80 bg-slate-900 rounded overflow-hidden flex items-center justify-center border border-slate-800">
-                        <img id="modalImgAfter" class="w-full h-full object-contain" src="" alt="維修後">
-                    </div>
-                </div>
-            </div>
+    <!-- 照片檢視 Modal -->
+    <div id="imageModal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onclick="closeImageModal()">
+        <div class="relative max-w-3xl w-full bg-slate-900 border border-slate-700 rounded-xl overflow-hidden p-2" onclick="event.stopPropagation()">
+            <button onclick="closeImageModal()" class="absolute top-3 right-3 text-white bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center z-10">✕</button>
+            <img id="modalImg" class="w-full h-auto max-h-[80vh] object-contain rounded-lg" alt="放大照片">
         </div>
     </div>
 
-    <!-- JavaScript 邏輯區 -->
+    <!-- 腳本邏輯 -->
     <script>
-        let boilers = [
-            { id: "B01", name: "#1 貫流式鍋爐 (1.0 Ton/hr)", type: "hotwater", detail: "型號: SF-1000, 常用壓力:1.0 MPa" },
-            { id: "B02", name: "#2 臥式火管鍋爐 (3.0 Ton/hr)", type: "steam", detail: "型號: SF-3000H, 常用壓力: 0.75 MPa" }
+        // 1. 初始化資料與狀態
+        let boilers = JSON.parse(localStorage.getItem('sf_boilers')) || [
+            { id: 'b1', name: '#1 貫流式鍋爐 (1.0 Ton/hr)', type: 'steam', detail: '型号: SF-1000Steam | 額定蒸氣壓: 0.8 MPa' },
+            { id: 'b2', name: '#2 熱水鍋爐 (50萬 Kcal)', type: 'hotwater', detail: '型號: SF-500HW | 常用出水溫: 85°C' }
+        ];
+        let currentBoilerId = localStorage.getItem('sf_current_boiler') || boilers[0].id;
+        
+        let inspectionRecords = JSON.parse(localStorage.getItem('sf_inspections')) || {
+            'b1': [
+                { date: '2026-07-21', dynamicParam: 0.75, flueTemp: 165, waterTemp: 65, inspector: '張工程師' },
+                { date: '2026-07-20', dynamicParam: 0.72, flueTemp: 160, waterTemp: 62, inspector: '張工程師' }
+            ],
+            'b2': [
+                { date: '2026-07-21', dynamicParam: 85, flueTemp: 145, waterTemp: 58, inspector: '張工程師' },
+                { date: '2026-07-20', dynamicParam: 84, flueTemp: 142, waterTemp: 55, inspector: '張工程師' }
+            ]
+        };
+
+        let maintenanceRecords = JSON.parse(localStorage.getItem('sf_maintenances')) || [
+            { id: 'm1', boilerId: 'b1', date: '2026-07-15', type: '定期保養', title: '燃燒機噴嘴清洗與濾網更換', status: '已完成', tech: '碩豐工程-陳技師', cost: 3500, notes: '運轉正常', photoBefore: '', photoAfter: '' }
         ];
 
-        let boilerRecords = {
-            "B01": [
-                { date: '07/17', flueTemp: 148, dynamicVal: 84, waterTemp: 58, inspector: '張工程師' },
-                { date: '07/18', flueTemp: 149, dynamicVal: 85, waterTemp: 59, inspector: '張工程師' },
-                { date: '07/19', flueTemp: 150, dynamicVal: 85, waterTemp: 60, inspector: '張工程師' },
-                { date: '07/20', flueTemp: 150, dynamicVal: 84, waterTemp: 60, inspector: '張工程師' },
-                { date: '07/21', flueTemp: 150, dynamicVal: 85, waterTemp: 60, inspector: '張工程師' }
-            ],
-            "B02": [
-                { date: '07/20', flueTemp: 180, dynamicVal: 0.75, waterTemp: 62, inspector: '張工程師' },
-                { date: '07/21', flueTemp: 182, dynamicVal: 0.76, waterTemp: 63, inspector: '張工程師' }
-            ]
-        };
-
-        // 預設樣例圖片 URL
-        const sampleBeforeImg = "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80";
-        const sampleAfterImg = "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=500&auto=format&fit=crop&q=80";
-
-        // 維修保養紀錄
-        let maintenanceRecords = {
-            "B01": [
-                { date: "2026-07-21", type: "定期保養", title: "冷媒qqqq", status: "已完成", tech: "-", cost: 4000, notes: "-", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg },
-                { date: "2026-07-25", type: "定期保養", title: "月度鍋爐內部積碳檢查與水位計校正", status: "處理中", tech: "廠區維護組", cost: 0, notes: "已安排下週排空作業", photoBefore: null, photoAfter: null },
-                { date: "2026-06-10", type: "零件更換", title: "給水幫浦高壓密封墊圈更換", status: "已完成", tech: "碩豐工程 - 王技師", cost: 2800, notes: "排除微幅洩漏問題", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg },
-                { date: "2026-07-15", type: "定期保養", title: "燃燒機噴嘴清洗與軟水系統鹽錠補充", status: "已完成", tech: "碩豐工程 - 陳技師", cost: 3500, notes: "系統運轉正常，軟水硬度降至 10 ppm", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg }
-            ],
-            "B02": [
-                { date: "2026-05-20", type: "年度大修", title: "安全閥壓力校驗與整體管路耐壓測試", status: "已完成", tech: "原廠第三方檢驗所", cost: 18000, notes: "取得安檢合格證書", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg }
-            ]
-        };
-
-        let tempPhotoBefore = null;
-        let tempPhotoAfter = null;
-        let selectedBoilerId = "B01";
         let trendChart = null;
 
-        // 手機版側欄切換控制
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentDateStr').innerText = new Date().toISOString().split('T')[0];
+            document.getElementById('maintInputDate').value = new Date().toISOString().split('T')[0];
+            
+            renderBoilerSelect();
+            updateUIByCurrentBoiler();
+            renderMaintenanceTable();
+            initChart();
+        });
+
+        // 切換側邊欄 (手機版)
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('mobileBackdrop');
-            if (sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.remove('-translate-x-full');
-                backdrop.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                backdrop.classList.add('hidden');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        // 切換 Tab
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-brand-600', 'text-white');
+                el.classList.add('text-slate-400');
+            });
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-brand-600', 'text-white');
+                activeNav.classList.remove('text-slate-400');
             }
         }
 
-        function renderBoilerOptions() {
-            const select = document.getElementById('leftBoilerSelect');
-            if (!select) return;
-            select.innerHTML = '';
-            boilers.forEach(function(b) {
-                const opt = document.createElement('option');
-                opt.value = b.id;
-                const typeName = b.type === 'hotwater' ? '[熱水鍋爐]' : '[蒸氣鍋爐]';
-                opt.innerText = typeName + ' ' + b.name;
-                if (b.id === selectedBoilerId) opt.selected = true;
-                select.appendChild(opt);
-            });
-            updateCurrentBoilerUI();
+        // 設備管理視窗 toggle
+        function toggleBoilerManager() {
+            document.getElementById('boilerManagerBox').classList.toggle('hidden');
         }
 
+        // 巡檢員編輯 toggle
+        function toggleInspectorForm() {
+            document.getElementById('inspectorFormBox').classList.toggle('hidden');
+        }
+
+        function saveInspectorInfo() {
+            const name = document.getElementById('inputInspectorName').value;
+            const dept = document.getElementById('inputInspectorDept').value;
+            if(name) {
+                document.getElementById('inspectorName').innerText = name;
+                document.getElementById('inspectorDept').innerText = dept;
+                toggleInspectorForm();
+            }
+        }
+
+        // 渲染設備下拉選單
+        function renderBoilerSelect() {
+            const select = document.getElementById('leftBoilerSelect');
+            select.innerHTML = boilers.map(b => `<option value="${b.id}" ${b.id === currentBoilerId ? 'selected' : ''}>${b.name}</option>`).join('');
+        }
+
+        // 設備變更
         function onBoilerChange() {
-            selectedBoilerId = document.getElementById('leftBoilerSelect').value;
-            updateCurrentBoilerUI();
-            renderHistoryTableAndChart();
+            currentBoilerId = document.getElementById('leftBoilerSelect').value;
+            localStorage.setItem('sf_current_boiler', currentBoilerId);
+            updateUIByCurrentBoiler();
+        }
+
+        // 更新 UI 資訊
+        function updateUIByCurrentBoiler() {
+            const b = boilers.find(x => x.id === currentBoilerId);
+            if (!b) return;
+
+            // 標題與規格
+            document.getElementById('headerBoilerTitle').innerText = b.name;
+            document.getElementById('headerBoilerBadge').innerText = b.type === 'steam' ? '蒸氣鍋爐' : '熱水鍋爐';
+            document.getElementById('leftBoilerDetailDisplay').innerText = b.detail || '暫無規格資訊';
+
+            // 修改欄位預設文字
+            document.getElementById('editBoilerName').value = b.name;
+            document.getElementById('editBoilerType').value = b.type;
+            document.getElementById('editBoilerDetail').value = b.detail || '';
+
+            // 動態標籤改變 (蒸氣壓 / 熱水溫)
+            const isSteam = b.type === 'steam';
+            const labelText = isSteam ? '蒸氣壓力 (MPa)' : '熱水出水溫度 (°C)';
+            document.getElementById('lblDynamicParam').innerText = labelText;
+            document.getElementById('thDynamicParam').innerText = labelText;
+            document.getElementById('inputDynamicParam').placeholder = isSteam ? '前次: 0.75 MPa' : '前次: 85 °C';
+
+            // 更新數據表與圖表
+            renderInspectionHistory();
+            updateChart();
             renderMaintenanceTable();
         }
 
-        function updateCurrentBoilerUI() {
-            const current = boilers.find(function(b) { return b.id === selectedBoilerId; });
-            if (!current) return;
-
-            document.getElementById('headerBoilerTitle').innerText = current.name;
-            document.getElementById('leftBoilerDetailDisplay').innerText = current.detail || '無填寫規格資料';
-
-            document.getElementById('editBoilerName').value = current.name;
-            document.getElementById('editBoilerType').value = current.type;
-            document.getElementById('editBoilerDetail').value = current.detail || '';
-
-            const records = boilerRecords[selectedBoilerId] || [];
-            const lastRecord = records.length > 0 ? records[records.length - 1] : null;
-
-            const badge = document.getElementById('headerBoilerBadge');
-            const dynamicLabel = document.getElementById('lblDynamicParam');
-            const thDynamic = document.getElementById('thDynamicParam');
-            const dynamicInput = document.getElementById('inputDynamicParam');
-
-            if (current.type === 'hotwater') {
-                badge.innerText = "熱水鍋爐";
-                badge.className = "text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium me-2";
-                dynamicLabel.innerText = "熱水出水溫度 (°C)";
-                if (thDynamic) thDynamic.innerText = "熱水溫度 (°C)";
-                dynamicInput.placeholder = lastRecord ? "前次: " + lastRecord.dynamicVal + " °C" : "請輸入熱水溫度";
-            } else {
-                badge.innerText = "蒸氣鍋爐";
-                badge.className = "text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full font-medium me-2";
-                dynamicLabel.innerText = "蒸氣壓力 (MPa)";
-                if (thDynamic) thDynamic.innerText = "蒸氣壓力 (MPa)";
-                dynamicInput.placeholder = lastRecord ? "前次: " + lastRecord.dynamicVal + " MPa" : "請輸入蒸氣壓力";
+        // 新增 / 修改設備
+        function saveCurrentBoilerName() {
+            const b = boilers.find(x => x.id === currentBoilerId);
+            if (b) {
+                b.name = document.getElementById('editBoilerName').value;
+                b.type = document.getElementById('editBoilerType').value;
+                b.detail = document.getElementById('editBoilerDetail').value;
+                localStorage.setItem('sf_boilers', JSON.stringify(boilers));
+                renderBoilerSelect();
+                updateUIByCurrentBoiler();
+                toggleBoilerManager();
             }
-
-            dynamicInput.value = "";
-            document.getElementById('inputFlueTemp').value = "";
-            document.getElementById('inputFlueTemp').placeholder = lastRecord ? "前次: " + lastRecord.flueTemp + " °C" : "請輸入排煙溫度";
-            
-            document.getElementById('inputWaterTemp').value = "";
-            document.getElementById('inputWaterTemp').placeholder = lastRecord ? "前次: " + lastRecord.waterTemp + " °C" : "請輸入給水溫度";
-
-            document.getElementById('inputHardness').value = "";
-            document.getElementById('inputNotes').value = "";
-
-            checkRealtimeHealth();
         }
 
-        // 上傳照片即時預覽
-        function previewImage(input, imgElementId) {
-            const file = input.files[0];
-            const imgEl = document.getElementById(imgElementId);
-            const placeholderEl = document.getElementById(imgElementId === 'previewBeforeImg' ? 'previewBeforePlaceholder' : 'previewAfterPlaceholder');
+        function addNewBoiler() {
+            const newId = 'b_' + Date.now();
+            const newB = {
+                id: newId,
+                name: document.getElementById('editBoilerName').value || '新設備',
+                type: document.getElementById('editBoilerType').value,
+                detail: document.getElementById('editBoilerDetail').value
+            };
+            boilers.push(newB);
+            currentBoilerId = newId;
+            inspectionRecords[newId] = [];
+            localStorage.setItem('sf_boilers', JSON.stringify(boilers));
+            localStorage.setItem('sf_inspections', JSON.stringify(inspectionRecords));
+            localStorage.setItem('sf_current_boiler', currentBoilerId);
+            
+            renderBoilerSelect();
+            updateUIByCurrentBoiler();
+            toggleBoilerManager();
+        }
 
+        // 提交日常巡檢
+        function submitInspection(e) {
+            e.preventDefault();
+            const dynParam = parseFloat(document.getElementById('inputDynamicParam').value);
+            const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value);
+            const waterTemp = parseFloat(document.getElementById('inputWaterTemp').value);
+            const inspector = document.getElementById('inspectorName').innerText;
+
+            const record = {
+                date: new Date().toISOString().split('T')[0],
+                dynamicParam: dynParam,
+                flueTemp: flueTemp,
+                waterTemp: waterTemp,
+                inspector: inspector
+            };
+
+            if (!inspectionRecords[currentBoilerId]) inspectionRecords[currentBoilerId] = [];
+            inspectionRecords[currentBoilerId].unshift(record);
+            localStorage.setItem('sf_inspections', JSON.stringify(inspectionRecords));
+
+            // AI 簡化診斷邏輯
+            calculateAIDiagnosis(flueTemp);
+
+            renderInspectionHistory();
+            updateChart();
+            alert('巡檢紀錄已成功儲存！');
+            document.getElementById('inspectionForm').reset();
+        }
+
+        function calculateAIDiagnosis(flueTemp) {
+            const scoreEl = document.getElementById('aiHealthScore');
+            const barEl = document.getElementById('aiHealthBar');
+            const statusText = document.getElementById('aiHealthStatusText');
+            const alertText = document.getElementById('aiAlertText');
+
+            if (flueTemp > 180) {
+                scoreEl.innerText = '68';
+                barEl.style.width = '68%';
+                statusText.innerText = '需要注意';
+                alertText.innerText = '排煙溫度過高，請檢查積碳或熱交換效能。';
+            } else {
+                scoreEl.innerText = '96';
+                barEl.style.width = '96%';
+                statusText.innerText = '運行良好';
+                alertText.innerText = '數據均在標準範圍內。';
+            }
+        }
+
+        // 渲染巡檢歷史
+        function renderInspectionHistory() {
+            const list = inspectionRecords[currentBoilerId] || [];
+            const tbody = document.getElementById('inspectionHistoryBody');
+            tbody.innerHTML = list.map(item => `
+                <tr class="hover:bg-slate-800/50">
+                    <td class="p-3">${item.date}</td>
+                    <td class="p-3 text-amber-400">${item.flueTemp} °C</td>
+                    <td class="p-3 text-sky-400">${item.dynamicParam}</td>
+                    <td class="p-3 text-emerald-400">${item.waterTemp} °C</td>
+                    <td class="p-3 text-slate-400">${item.inspector}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 照片預覽處理
+        function previewImage(input, imgId, placeholderId) {
+            const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    imgEl.src = e.target.result;
-                    imgEl.classList.remove('hidden');
-                    if (placeholderEl) placeholderEl.classList.add('hidden');
-
-                    if (imgElementId === 'previewBeforeImg') {
-                        tempPhotoBefore = e.target.result;
-                    } else {
-                        tempPhotoAfter = e.target.result;
-                    }
+                    const img = document.getElementById(imgId);
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById(placeholderId).classList.add('hidden');
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // 渲染維修履歷對照表
-        function renderMaintenanceTable() {
-            const list = maintenanceRecords[selectedBoilerId] || [];
-            const tbody = document.getElementById('maintenanceHistoryBody');
-            if (!tbody) return;
+        // 提交維修工單
+        function submitMaintenance(e) {
+            e.preventDefault();
+            const date = document.getElementById('maintInputDate').value;
+            const type = document.getElementById('maintInputType').value;
+            const title = document.getElementById('maintInputTitle').value;
+            const status = document.getElementById('maintInputStatus').value;
+            const tech = document.getElementById('maintInputTech').value || '未指定';
+            const cost = parseFloat(document.getElementById('maintInputCost').value) || 0;
+            const notes = document.getElementById('maintInputNotes').value;
 
-            tbody.innerHTML = '';
+            const photoBefore = document.getElementById('previewBeforeImg').src || '';
+            const photoAfter = document.getElementById('previewAfterImg').src || '';
 
-            let pending = 0;
-            let completed = 0;
-            let totalCost = 0;
+            const newMaint = {
+                id: 'm_' + Date.now(),
+                boilerId: currentBoilerId,
+                date, type, title, status, tech, cost, notes,
+                photoBefore: photoBefore.startsWith('data:') ? photoBefore : '',
+                photoAfter: photoAfter.startsWith('data:') ? photoAfter : ''
+            };
 
-            if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">此設備尚無維修保養紀錄。</td></tr>';
-            } else {
-                list.slice().forEach(function(item) {
-                    if (item.status === '已完成') completed++;
-                    else pending++;
-                    totalCost += (parseFloat(item.cost) || 0);
+            maintenanceRecords.unshift(newMaint);
+            localStorage.setItem('sf_maintenances', JSON.stringify(maintenanceRecords));
 
-                    let statusBadge = '';
-                    if (item.status === '已完成') {
-                        statusBadge = '<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">已完成</span>';
-                    } else if (item.status === '處理中') {
-                        statusBadge = '<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold">處理中</span>';
-                    } else {
-                        statusBadge = '<span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px]">待派工</span>';
-                    }
-
-                    // 圖片縮圖區塊 HTML
-                    let photoHTML = '<span class="text-slate-500 text-[10px]">無照片</span>';
-                    if (item.photoBefore || item.photoAfter) {
-                        const beforeSrc = item.photoBefore || item.photoAfter;
-                        const afterSrc = item.photoAfter || item.photoBefore;
-                        photoHTML = `
-                            <div class="flex items-center gap-1.5 cursor-pointer group" onclick="openImageModal('${beforeSrc}', '${afterSrc}', '${item.title}')">
-                                ${item.photoBefore ? `<img src="${item.photoBefore}" class="w-9 h-9 rounded border border-amber-500/50 object-cover group-hover:scale-105 transition-transform" title="點擊放大(維修前)">` : ''}
-                                ${item.photoAfter ? `<img src="${item.photoAfter}" class="w-9 h-9 rounded border border-emerald-500/50 object-cover group-hover:scale-105 transition-transform" title="點擊放大(維修後)">` : ''}
-                            </div>
-                        `;
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-800/50 transition-colors";
-                    tr.innerHTML = 
-                        '<td class="p-3 text-slate-200 font-medium whitespace-nowrap">' + item.date + '</td>' +
-                        '<td class="p-3 text-sky-400 font-sans font-medium whitespace-nowrap">' + item.type + '</td>' +
-                        '<td class="p-3 text-slate-100 font-sans font-bold">' + item.title + '</td>' +
-                        '<td class="p-3 font-sans">' + photoHTML + '</td>' +
-                        '<td class="p-3 font-sans whitespace-nowrap">' + statusBadge + '</td>' +
-                        '<td class="p-3 text-slate-300 font-sans whitespace-nowrap">' + (item.tech || '-') + '</td>' +
-                        '<td class="p-3 text-purple-300 font-bold whitespace-nowrap">$ ' + (item.cost ? Number(item.cost).toLocaleString() : '0') + '</td>' +
-                        '<td class="p-3 text-slate-400 font-sans">' + (item.notes || '-') + '</td>';
-                    
-                    tbody.appendChild(tr);
-                });
-            }
-
-            document.getElementById('maintTotalCount').innerText = list.length;
-            document.getElementById('maintPendingCount').innerText = pending;
-            document.getElementById('maintCompletedCount').innerText = completed;
-            document.getElementById('maintTotalCost').innerText = '$ ' + totalCost.toLocaleString();
+            renderMaintenanceTable();
+            alert('維修工單建立成功！');
+            e.target.reset();
+            
+            // 重置預覽
+            document.getElementById('previewBeforeImg').classList.add('hidden');
+            document.getElementById('previewBeforePlaceholder').classList.remove('hidden');
+            document.getElementById('previewAfterImg').classList.add('hidden');
+            document.getElementById('previewAfterPlaceholder').classList.remove('hidden');
         }
 
-        // 打開對照照片 Modal 視窗
-        function openImageModal(beforeSrc, afterSrc, title) {
-            document.getElementById('modalImageTitle').innerText = title + " - 照片對照";
-            const beforeImg = document.getElementById('modalImgBefore');
-            const afterImg = document.getElementById('modalImgAfter');
-            const containerBefore = document.getElementById('containerBefore');
-            const containerAfter = document.getElementById('containerAfter');
+        // 渲染維修履歷表格與 KPI
+        function renderMaintenanceTable() {
+            const filtered = maintenanceRecords.filter(m => m.boilerId === currentBoilerId);
+            
+            // 計算 KPI
+            const totalCount = filtered.length;
+            const pendingCount = filtered.filter(m => m.status !== '已完成').length;
+            const completedCount = filtered.filter(m => m.status === '已完成').length;
+            const totalCost = filtered.reduce((acc, cur) => acc + (cur.cost || 0), 0);
 
-            if (beforeSrc && beforeSrc !== 'null') {
-                beforeImg.src = beforeSrc;
-                containerBefore.classList.remove('hidden');
-            } else {
-                containerBefore.classList.add('hidden');
+            document.getElementById('maintTotalCount').innerText = totalCount;
+            document.getElementById('maintPendingCount').innerText = pendingCount;
+            document.getElementById('maintCompletedCount').innerText = completedCount;
+            document.getElementById('maintTotalCost').innerText = '$' + totalCost.toLocaleString();
+
+            const tbody = document.getElementById('maintenanceHistoryBody');
+            tbody.innerHTML = filtered.map(m => `
+                <tr class="hover:bg-slate-800/50">
+                    <td class="p-3">${m.date}</td>
+                    <td class="p-3"><span class="bg-slate-800 border border-slate-700 text-slate-300 px-2 py-0.5 rounded text-[11px]">${m.type}</span></td>
+                    <td class="p-3 font-bold text-slate-100">${m.title}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] ${m.status === '已完成' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
+                            ${m.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-slate-400">${m.tech}</td>
+                    <td class="p-3 text-purple-300 font-bold">$${(m.cost || 0).toLocaleString()}</td>
+                    <td class="p-3">
+                        <div class="flex gap-1.5">
+                            ${m.photoBefore ? `<button onclick="openImageModal('${m.photoBefore}')" class="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded hover:bg-amber-500/20">前圖</button>` : ''}
+                            ${m.photoAfter ? `<button onclick="openImageModal('${m.photoAfter}')" class="text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded hover:bg-emerald-500/20">後圖</button>` : ''}
+                            ${!m.photoBefore && !m.photoAfter ? '<span class="text-slate-600 text-[11px]">無照片</span>' : ''}
+                        </div>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteMaintenance('${m.id}')" class="text-rose-400 hover:text-rose-300 text-xs p-1" title="刪除工單">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteMaintenance(id) {
+            if (confirm('確定要刪除這筆保養工單嗎？')) {
+                maintenanceRecords = maintenanceRecords.filter(m => m.id !== id);
+                localStorage.setItem('sf_maintenances', JSON.stringify(maintenanceRecords));
+                renderMaintenanceTable();
             }
+        }
 
-            if (afterSrc && afterSrc !== 'null') {
-                afterImg.src = afterSrc;
-                containerAfter.classList.remove('hidden');
-            } else {
-                containerAfter.classList.add('hidden');
-            }
-
+        // Modal 照片放大查看
+        function openImageModal(src) {
+            document.getElementById('modalImg').src = src;
             document.getElementById('imageModal').classList.remove('hidden');
         }
 
@@ -788,333 +856,43 @@
             document.getElementById('imageModal').classList.add('hidden');
         }
 
-        function submitMaintenance(e) {
-            e.preventDefault();
-            const date = document.getElementById('maintInputDate').value;
-            const type = document.getElementById('maintInputType').value;
-            const title = document.getElementById('maintInputTitle').value.trim();
-            const status = document.getElementById('maintInputStatus').value;
-            const tech = document.getElementById('maintInputTech').value.trim();
-            const cost = parseFloat(document.getElementById('maintInputCost').value) || 0;
-            const notes = document.getElementById('maintInputNotes').value.trim();
-
-            if (!date || !title) return alert("請填寫保養日期與保養項目名稱！");
-
-            if (!maintenanceRecords[selectedBoilerId]) {
-                maintenanceRecords[selectedBoilerId] = [];
-            }
-
-            maintenanceRecords[selectedBoilerId].unshift({
-                date: date,
-                type: type,
-                title: title,
-                status: status,
-                tech: tech,
-                cost: cost,
-                notes: notes,
-                photoBefore: tempPhotoBefore,
-                photoAfter: tempPhotoAfter
-            });
-
-            // 清空圖片上傳暫存
-            tempPhotoBefore = null;
-            tempPhotoAfter = null;
-            document.getElementById('previewBeforeImg').classList.add('hidden');
-            document.getElementById('previewAfterImg').classList.add('hidden');
-            document.getElementById('previewBeforePlaceholder').classList.remove('hidden');
-            document.getElementById('previewAfterPlaceholder').classList.remove('hidden');
-            document.getElementById('maintPhotoBeforeInput').value = '';
-            document.getElementById('maintPhotoAfterInput').value = '';
-
-            alert("✅ 保養維修工單已成功建立！");
-            renderMaintenanceTable();
-        }
-
-        // 動態診斷
-        function checkRealtimeHealth() {
-            const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value) || 0;
-            const hardness = parseFloat(document.getElementById('inputHardness').value) || 0;
-
-            let score = 96;
-            let title = "狀態正常";
-            let warningMsg = "數據均在標準範圍內。";
-
-            if (flueTemp > 250 || hardness > 50) {
-                score = 45;
-                title = "警示：嚴重異常！";
-                if (flueTemp > 250) warningMsg = "⚠️ 排煙溫度高達 " + flueTemp + "°C，過高！";
-                if (hardness > 50) warningMsg = "🚨 水質硬度過高 (" + hardness + " ppm)！";
-            } else if (flueTemp > 200 || hardness > 15) {
-                score = 72;
-                title = "提醒：數據偏高";
-                if (flueTemp > 200) warningMsg = "⚡ 排煙溫度偏高 (" + flueTemp + "°C)。";
-                if (hardness > 15) warningMsg = "⚡ 水質硬度偏高 (" + hardness + " ppm)。";
-            }
-
-            updateAIHealthUI(score, title, warningMsg);
-        }
-
-        function updateAIHealthUI(score, title, warningMsg) {
-            const scoreEl = document.getElementById('aiHealthScore');
-            const badgeEl = document.getElementById('aiHealthBadge');
-            const statusTextEl = document.getElementById('aiHealthStatusText');
-            const barEl = document.getElementById('aiHealthBar');
-            const noticeEl = document.getElementById('aiAlertNotice');
-            const alertTitleEl = document.getElementById('aiAlertTitle');
-            const alertTextEl = document.getElementById('aiAlertText');
-            const alertIconEl = document.getElementById('aiAlertIcon');
-
-            if (!scoreEl) return;
-
-            scoreEl.innerText = score;
-            if (barEl) barEl.style.width = score + '%';
-
-            if (score >= 90) {
-                scoreEl.className = "text-4xl font-black tracking-tight text-emerald-400 drop-shadow-md";
-                badgeEl.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
-                statusTextEl.innerText = "運行良好";
-                barEl.className = "bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500";
-                noticeEl.className = "mt-3 p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-[11px] text-emerald-300 flex items-start gap-2";
-                alertIconEl.className = "fa-solid fa-circle-check text-sm shrink-0 mt-0.5 text-emerald-400";
-            } else if (score >= 70) {
-                scoreEl.className = "text-4xl font-black tracking-tight text-amber-400 drop-shadow-md";
-                badgeEl.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40";
-                statusTextEl.innerText = "預警注意";
-                barEl.className = "bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-500";
-                noticeEl.className = "mt-3 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[11px] text-amber-300 flex items-start gap-2";
-                alertIconEl.className = "fa-solid fa-triangle-exclamation text-sm shrink-0 mt-0.5 text-amber-400";
-            } else {
-                scoreEl.className = "text-4xl font-black tracking-tight text-rose-500 drop-shadow-md";
-                badgeEl.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40";
-                statusTextEl.innerText = "嚴重異常";
-                barEl.className = "bg-gradient-to-r from-rose-600 to-red-500 h-full rounded-full transition-all duration-500";
-                noticeEl.className = "mt-3 p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-[11px] text-rose-300 flex items-start gap-2";
-                alertIconEl.className = "fa-solid fa-circle-radiation text-sm shrink-0 mt-0.5 text-rose-400 animate-pulse";
-            }
-
-            if (alertTitleEl) alertTitleEl.innerText = title;
-            if (alertTextEl) alertTextEl.innerText = warningMsg;
-        }
-
-        function toggleBoilerManager() {
-            document.getElementById('boilerManagerBox').classList.toggle('hidden');
-        }
-
-        function saveCurrentBoilerName() {
-            const newName = document.getElementById('editBoilerName').value.trim();
-            const newType = document.getElementById('editBoilerType').value;
-            const newDetail = document.getElementById('editBoilerDetail').value.trim();
-            if (!newName) return alert("請輸入設備名稱！");
-            
-            const current = boilers.find(function(b) { return b.id === selectedBoilerId; });
-            if (current) {
-                current.name = newName;
-                current.type = newType;
-                current.detail = newDetail;
-                renderBoilerOptions();
-                alert("✅ 設備資訊已成功修改！");
-            }
-        }
-
-        function addNewBoiler() {
-            const newName = document.getElementById('editBoilerName').value.trim();
-            const newType = document.getElementById('editBoilerType').value;
-            const newDetail = document.getElementById('editBoilerDetail').value.trim();
-            if (!newName) return alert("請輸入新設備名稱！");
-            
-            const newId = "B" + String(boilers.length + 1).padStart(2, '0');
-            boilers.push({ id: newId, name: newName, type: newType, detail: newDetail || "暫無規格備註" });
-            boilerRecords[newId] = [];
-            maintenanceRecords[newId] = [];
-            selectedBoilerId = newId;
-            renderBoilerOptions();
-            alert("✅ 新設備建立完成！已自動切換至該設備。");
-        }
-
-        function toggleInspectorForm() {
-            document.getElementById('inspectorFormBox').classList.toggle('hidden');
-        }
-
-        function saveInspectorInfo() {
-            const name = document.getElementById('inputInspectorName').value.trim();
-            const dept = document.getElementById('inputInspectorDept').value.trim();
-            if (name) document.getElementById('inspectorName').innerText = name;
-            if (dept) document.getElementById('inspectorDept').innerText = dept;
-            document.getElementById('inspectorFormBox').classList.add('hidden');
-            alert("✅ 巡檢員資料已成功更新！");
-        }
-
-        function renderHistoryTableAndChart() {
-            const current = boilers.find(function(b) { return b.id === selectedBoilerId; });
-            const records = boilerRecords[selectedBoilerId] || [];
-            const isHotWater = current && current.type === 'hotwater';
-
-            const tbody = document.getElementById('inspectionHistoryBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            if (records.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">尚無巡檢紀錄，請先填報巡檢資料。</td></tr>';
-            } else {
-                records.slice().reverse().forEach(function(r) {
-                    const tr = document.createElement('tr');
-                    const unitStr = isHotWater ? '°C' : 'MPa';
-                    tr.className = "hover:bg-slate-800/50 transition-colors";
-                    tr.innerHTML = '<td class="p-3 font-medium text-slate-200">' + r.date + '</td>' +
-                        '<td class="p-3 text-amber-400 font-bold">' + r.flueTemp + ' °C</td>' +
-                        '<td class="p-3 text-sky-400 font-semibold">' + r.dynamicVal + ' ' + unitStr + '</td>' +
-                        '<td class="p-3 text-emerald-400 font-semibold">' + r.waterTemp + ' °C</td>' +
-                        '<td class="p-3 text-slate-300 font-sans">' + r.inspector + '</td>';
-                    tbody.appendChild(tr);
-                });
-            }
-
-            const labels = records.map(function(r) { return r.date; });
-            const flueTemps = records.map(function(r) { return r.flueTemp; });
-            const waterTemps = records.map(function(r) { return r.waterTemp; });
-            const dynamicVals = records.map(function(r) { return r.dynamicVal; });
-            const dynamicLabelText = isHotWater ? '熱水溫度 (°C)' : '蒸氣壓力 (MPa)';
-
-            const chartDatasets = [
-                {
-                    label: '排煙溫度 (°C)',
-                    data: flueTemps,
-                    borderColor: '#f59e0b',
-                    backgroundColor: '#f59e0b',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    tension: 0.2
+        // 初始化與更新 Chart.js 圖表
+        function initChart() {
+            const ctx = document.getElementById('inspectionTrendChart').getContext('2d');
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: '排煙溫度 (°C)', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.3 },
+                        { label: '關鍵參數', data: [], borderColor: '#38bdf8', backgroundColor: 'transparent', tension: 0.3 }
+                    ]
                 },
-                {
-                    label: '給水溫度 (°C)',
-                    data: waterTemps,
-                    borderColor: '#10b981',
-                    backgroundColor: '#10b981',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    tension: 0.2
-                },
-                {
-                    label: dynamicLabelText,
-                    data: dynamicVals,
-                    borderColor: '#38bdf8',
-                    backgroundColor: '#38bdf8',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    tension: 0.2
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+                    }
                 }
-            ];
-
-            if (trendChart) {
-                trendChart.data.labels = labels;
-                trendChart.data.datasets = chartDatasets;
-                trendChart.update();
-            } else {
-                const chartCanvas = document.getElementById('inspectionTrendChart');
-                if (chartCanvas) {
-                    const ctx = chartCanvas.getContext('2d');
-                    trendChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: chartDatasets
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                    labels: { color: '#cbd5e1', font: { size: 11 }, boxWidth: 12 }
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                                    ticks: { color: '#94a3b8', font: { size: 10 } }
-                                },
-                                y: {
-                                    grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                                    ticks: { color: '#94a3b8', font: { size: 10 } }
-                                }
-                            }
-                        }
-                    });
-                }
-            }
+            });
+            updateChart();
         }
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.add('hidden'); });
-            document.querySelectorAll('.nav-item').forEach(function(el) {
-                el.classList.remove('bg-brand-600', 'text-white');
-                el.classList.add('text-slate-400');
-            });
-
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            const activeNav = document.getElementById('nav-' + tabId);
-            if (activeNav) {
-                activeNav.classList.add('bg-brand-600', 'text-white');
-                activeNav.classList.remove('text-slate-400');
-            }
-
-            // 在手機點擊選單後自動收合側欄
-            if (window.innerWidth < 1024) {
-                const sidebar = document.getElementById('sidebar');
-                if (!sidebar.classList.contains('-translate-x-full')) {
-                    toggleSidebar();
-                }
-            }
-
-            if (tabId === 'trends') {
-                renderHistoryTableAndChart();
-            } else if (tabId === 'maintenance') {
-                renderMaintenanceTable();
-            }
+        function updateChart() {
+            if (!trendChart) return;
+            const list = [...(inspectionRecords[currentBoilerId] || [])].reverse();
+            const b = boilers.find(x => x.id === currentBoilerId);
+            
+            trendChart.data.labels = list.map(i => i.date);
+            trendChart.data.datasets[0].data = list.map(i => i.flueTemp);
+            trendChart.data.datasets[1].data = list.map(i => i.dynamicParam);
+            trendChart.data.datasets[1].label = b && b.type === 'steam' ? '蒸氣壓力 (MPa)' : '熱水溫度 (°C)';
+            
+            trendChart.update();
         }
-
-        function submitInspection(e) {
-            e.preventDefault();
-            const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value);
-            const dynamicVal = parseFloat(document.getElementById('inputDynamicParam').value);
-            const waterTemp = parseFloat(document.getElementById('inputWaterTemp').value);
-            const currentInspector = document.getElementById('inspectorName').innerText;
-
-            const now = new Date();
-            const dateStr = String(now.getMonth()+1).padStart(2,'0') + '/' + String(now.getDate()).padStart(2,'0');
-
-            if (!boilerRecords[selectedBoilerId]) {
-                boilerRecords[selectedBoilerId] = [];
-            }
-
-            boilerRecords[selectedBoilerId].push({
-                date: dateStr,
-                flueTemp: flueTemp,
-                dynamicVal: dynamicVal,
-                waterTemp: waterTemp,
-                inspector: currentInspector
-            });
-
-            alert("✅ 巡檢紀錄提交成功！數據已自動同步。");
-            updateCurrentBoilerUI();
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            renderBoilerOptions();
-            renderHistoryTableAndChart();
-            renderMaintenanceTable();
-
-            // 預設日期為今天
-            const today = new Date().toISOString().split('T')[0];
-            const dateInput = document.getElementById('maintInputDate');
-            if (dateInput) dateInput.value = today;
-
-            // 監聽輸入即時變更分數與顏色
-            ['inputFlueTemp', 'inputHardness', 'inputDynamicParam'].forEach(function(id) {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('input', checkRealtimeHealth);
-            });
-        });
     </script>
 </body>
 </html>
