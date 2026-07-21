@@ -12,33 +12,25 @@ function updateAIHealthUI(score, warningMsg) {
     barEl.style.width = score + '%';
 
     if (score >= 90) {
-        // 🟢 綠色：良好
         scoreEl.className = "text-3xl font-black text-emerald-400";
-        badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-        statusTextEl.innerText = "運行良好";
-        barEl.className = "bg-emerald-400 h-full rounded-full transition-all duration-500";
-        
-        noticeEl.className = "mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300 flex items-start gap-2";
-        alertTextEl.innerText = warningMsg || "巡檢數據全數正常，目前無預警異常，請持續保持。";
-
+        if (badgeEl) badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+        if (statusTextEl) statusTextEl.innerText = "運行良好";
+        if (barEl) barEl.className = "bg-emerald-400 h-full rounded-full transition-all duration-500";
+        if (noticeEl) noticeEl.className = "mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300 flex items-start gap-2";
+        if (alertTextEl) alertTextEl.innerText = warningMsg || "巡檢數據全數正常，目前無預警異常，請持續保持。";
     } else if (score >= 70) {
-        // 🟡 黃色：警告 / 需注意
         scoreEl.className = "text-3xl font-black text-amber-400";
-        badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30";
-        statusTextEl.innerText = "預警注意";
-        barEl.className = "bg-amber-400 h-full rounded-full transition-all duration-500";
-
-        noticeEl.className = "mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300 flex items-start gap-2";
-        alertTextEl.innerText = warningMsg || "注意事項：排煙溫度稍微偏高，請留意是否需要清洗爐管。";
-
+        if (badgeEl) badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        if (statusTextEl) statusTextEl.innerText = "預警注意";
+        if (barEl) barEl.className = "bg-amber-400 h-full rounded-full transition-all duration-500";
+        if (noticeEl) noticeEl.className = "mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300 flex items-start gap-2";
+        if (alertTextEl) alertTextEl.innerText = warningMsg || "注意事項：排煙溫度稍微偏高，請留意是否需要清洗爐管。";
     } else {
-        // 🔴 紅色：危險 / 需保養
         scoreEl.className = "text-3xl font-black text-rose-500";
-        badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30";
-        statusTextEl.innerText = "嚴重異常";
-        barEl.className = "bg-rose-500 h-full rounded-full transition-all duration-500";
-
-        noticeEl.className = "mt-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-xs text-rose-300 flex items-start gap-2";
-        alertTextEl.innerText = warningMsg || "警告：數據嚴重偏差！水質硬度或壓力異常，請立即派員檢修！";
+        if (badgeEl) badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+        if (statusTextEl) statusTextEl.innerText = "嚴重異常";
+        if (barEl) barEl.className = "bg-rose-500 h-full rounded-full transition-all duration-500";
+        if (noticeEl) noticeEl.className = "mt-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-xs text-rose-300 flex items-start gap-2";
+        if (alertTextEl) alertTextEl.innerText = warningMsg || "警告：數據嚴重偏差！水質硬度或壓力異常，請立即派員檢修！";
     }
 }
