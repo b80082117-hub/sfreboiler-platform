@@ -6,7 +6,7 @@
     <title>碩豐熱能 - 巡檢與履歷管理平台</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome 圖示 -->
+    <!-- FontAwesome 圖示 CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -231,42 +231,56 @@
                         </form>
                     </div>
 
-                    <!-- AI 即時診斷卡片（包含色彩指標） -->
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 flex flex-col justify-between h-full">
-                        <div>
-                            <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
-                                <i class="fa-solid fa-microchip text-purple-400"></i> AI 巡檢即時診斷
-                            </h2>
+                    <!-- AI 即時診斷卡片 -->
+                    <div class="bg-gradient-to-b from-slate-800/90 to-slate-900/90 border border-purple-500/30 rounded-xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-                            <!-- 健康度與燈號標籤 -->
-                            <div class="p-4 bg-slate-900/80 rounded-xl border border-slate-700 space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-slate-400 font-medium">設備健康狀態</span>
-                                    <span id="aiHealthBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        <div>
+                            <!-- 卡片標頭 -->
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-700/80 mb-5">
+                                <h2 class="font-bold text-slate-100 flex items-center gap-2 text-sm">
+                                    <i class="fa-solid fa-brain text-purple-400 text-base"></i> AI 巡檢即時診斷
+                                </h2>
+                                <span class="text-[10px] text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/30 font-mono">LIVE</span>
+                            </div>
+
+                            <!-- 儀表板核心區塊 -->
+                            <div class="bg-slate-950/70 rounded-xl p-5 border border-slate-800 text-center relative space-y-4">
+                                <div class="flex justify-between items-center text-xs text-slate-400">
+                                    <span>設備即時健康指數</span>
+                                    <span id="aiHealthBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
                                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                                         <span id="aiHealthStatusText">運行良好</span>
                                     </span>
                                 </div>
 
-                                <!-- 分數與進度條 -->
-                                <div>
-                                    <div class="flex justify-between items-baseline mb-1">
-                                        <div class="flex items-baseline gap-1">
-                                            <span id="aiHealthScore" class="text-3xl font-black text-emerald-400">96</span>
-                                            <span class="text-xs text-slate-500">/ 100</span>
-                                        </div>
+                                <!-- 大型數字顯示區 -->
+                                <div class="py-2 flex items-center justify-center gap-1">
+                                    <span id="aiHealthScore" class="text-5xl font-black tracking-tight text-emerald-400 drop-shadow-md">96</span>
+                                    <span class="text-sm font-semibold text-slate-500 self-end mb-1">/ 100 分</span>
+                                </div>
+
+                                <!-- 全寬動態進度條 -->
+                                <div class="space-y-1">
+                                    <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                                        <div id="aiHealthBar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500" style="width: 96%;"></div>
                                     </div>
-                                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                                        <div id="aiHealthBar" class="bg-emerald-400 h-full rounded-full transition-all duration-500" style="width: 96%;"></div>
+                                    <div class="flex justify-between text-[10px] text-slate-500 font-mono pt-1">
+                                        <span>0 (危險)</span>
+                                        <span>70 (注意)</span>
+                                        <span>100 (正常)</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 即時建議 / 警告訊息 -->
-                        <div id="aiAlertNotice" class="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300 flex items-start gap-2">
-                            <i class="fa-solid fa-circle-check text-base shrink-0 mt-0.5"></i>
-                            <span id="aiAlertText">巡檢數據全數正常，目前無預警異常，請持續保持。</span>
+                        <!-- 下方即時診斷建議 / 警示訊息區塊 -->
+                        <div id="aiAlertNotice" class="mt-4 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs text-emerald-300 flex items-start gap-2.5 transition-all">
+                            <i id="aiAlertIcon" class="fa-solid fa-circle-check text-base shrink-0 mt-0.5 text-emerald-400"></i>
+                            <div class="space-y-0.5">
+                                <p class="font-bold text-emerald-200" id="aiAlertTitle">診斷結果：狀態正常</p>
+                                <p id="aiAlertText" class="text-emerald-300/90 leading-relaxed">目前巡檢數據均在標準安全範圍內，請保持定期巡檢。</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -414,16 +428,42 @@
             document.getElementById('inputHardness').value = "";
             document.getElementById('inputNotes').value = "";
 
-            updateAIHealthUI(96, "巡檢數據全數正常，目前無預警異常，請持續保持。");
+            checkRealtimeHealth();
         }
 
-        function updateAIHealthUI(score, warningMsg) {
+        // 動態即時計算健康度與更新 UI (顏色燈號/文字/警告標籤)
+        function checkRealtimeHealth() {
+            const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value) || 0;
+            const hardness = parseFloat(document.getElementById('inputHardness').value) || 0;
+
+            let score = 96;
+            let title = "診斷結果：狀態正常";
+            let warningMsg = "目前巡檢數據均在標準安全範圍內，請保持定期巡檢。";
+
+            if (flueTemp > 250 || hardness > 50) {
+                score = 45;
+                title = "警示：設備嚴重異常！";
+                if (flueTemp > 250) warningMsg = "⚠️ 排煙溫度高達 " + flueTemp + "°C，遠超安全極限！";
+                if (hardness > 50) warningMsg = "🚨 水質硬度過高 (" + hardness + " ppm)，請立即檢修軟水設備！";
+            } else if (flueTemp > 200 || hardness > 15) {
+                score = 72;
+                title = "提醒：注意數值偏高";
+                if (flueTemp > 200) warningMsg = "⚡ 排煙溫度偏高 (" + flueTemp + "°C)，請留意管路積碳狀態。";
+                if (hardness > 15) warningMsg = "⚡ 水質硬度稍高 (" + hardness + " ppm)，建議補充鹽錠。";
+            }
+
+            updateAIHealthUI(score, title, warningMsg);
+        }
+
+        function updateAIHealthUI(score, title, warningMsg) {
             const scoreEl = document.getElementById('aiHealthScore');
             const badgeEl = document.getElementById('aiHealthBadge');
             const statusTextEl = document.getElementById('aiHealthStatusText');
             const barEl = document.getElementById('aiHealthBar');
             const noticeEl = document.getElementById('aiAlertNotice');
+            const alertTitleEl = document.getElementById('aiAlertTitle');
             const alertTextEl = document.getElementById('aiAlertText');
+            const alertIconEl = document.getElementById('aiAlertIcon');
 
             if (!scoreEl) return;
 
@@ -431,27 +471,30 @@
             if (barEl) barEl.style.width = score + '%';
 
             if (score >= 90) {
-                scoreEl.className = "text-3xl font-black text-emerald-400";
-                if (badgeEl) badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                if (statusTextEl) statusTextEl.innerText = "運行良好";
-                if (barEl) barEl.className = "bg-emerald-400 h-full rounded-full transition-all duration-500";
-                if (noticeEl) noticeEl.className = "mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300 flex items-start gap-2";
-                if (alertTextEl) alertTextEl.innerText = warningMsg || "巡檢數據全數正常，目前無預警異常，請持續保持。";
+                scoreEl.className = "text-5xl font-black tracking-tight text-emerald-400 drop-shadow-md";
+                badgeEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+                statusTextEl.innerText = "運行良好";
+                barEl.className = "bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500";
+                noticeEl.className = "mt-4 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs text-emerald-300 flex items-start gap-2.5";
+                alertIconEl.className = "fa-solid fa-circle-check text-base shrink-0 mt-0.5 text-emerald-400";
             } else if (score >= 70) {
-                scoreEl.className = "text-3xl font-black text-amber-400";
-                if (badgeEl) badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30";
-                if (statusTextEl) statusTextEl.innerText = "預警注意";
-                if (barEl) barEl.className = "bg-amber-400 h-full rounded-full transition-all duration-500";
-                if (noticeEl) noticeEl.className = "mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300 flex items-start gap-2";
-                if (alertTextEl) alertTextEl.innerText = warningMsg || "注意事項：排煙溫度稍微偏高，請留意是否需要清洗爐管。";
+                scoreEl.className = "text-5xl font-black tracking-tight text-amber-400 drop-shadow-md";
+                badgeEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40";
+                statusTextEl.innerText = "預警注意";
+                barEl.className = "bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-500";
+                noticeEl.className = "mt-4 p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300 flex items-start gap-2.5";
+                alertIconEl.className = "fa-solid fa-triangle-exclamation text-base shrink-0 mt-0.5 text-amber-400";
             } else {
-                scoreEl.className = "text-3xl font-black text-rose-500";
-                if (badgeEl) badgeEl.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30";
-                if (statusTextEl) statusTextEl.innerText = "嚴重異常";
-                if (barEl) barEl.className = "bg-rose-500 h-full rounded-full transition-all duration-500";
-                if (noticeEl) noticeEl.className = "mt-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-xs text-rose-300 flex items-start gap-2";
-                if (alertTextEl) alertTextEl.innerText = warningMsg || "警告：數據嚴重偏差！水質硬度或壓力異常，請立即派員檢修！";
+                scoreEl.className = "text-5xl font-black tracking-tight text-rose-500 drop-shadow-md";
+                badgeEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40";
+                statusTextEl.innerText = "嚴重異常";
+                barEl.className = "bg-gradient-to-r from-rose-600 to-red-500 h-full rounded-full transition-all duration-500";
+                noticeEl.className = "mt-4 p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-start gap-2.5";
+                alertIconEl.className = "fa-solid fa-circle-radiation text-base shrink-0 mt-0.5 text-rose-400 animate-pulse";
             }
+
+            if (alertTitleEl) alertTitleEl.innerText = title;
+            if (alertTextEl) alertTextEl.innerText = warningMsg;
         }
 
         function toggleBoilerManager() {
@@ -462,7 +505,6 @@
             const newName = document.getElementById('editBoilerName').value.trim();
             const newType = document.getElementById('editBoilerType').value;
             const newDetail = document.getElementById('editBoilerDetail').value.trim();
-            
             if (!newName) return alert("請輸入設備名稱！");
             
             const current = boilers.find(function(b) { return b.id === selectedBoilerId; });
@@ -479,16 +521,10 @@
             const newName = document.getElementById('editBoilerName').value.trim();
             const newType = document.getElementById('editBoilerType').value;
             const newDetail = document.getElementById('editBoilerDetail').value.trim();
-            
             if (!newName) return alert("請輸入新設備名稱！");
             
             const newId = "B" + String(boilers.length + 1).padStart(2, '0');
-            boilers.push({ 
-                id: newId, 
-                name: newName, 
-                type: newType, 
-                detail: newDetail || "暫無規格備註" 
-            });
+            boilers.push({ id: newId, name: newName, type: newType, detail: newDetail || "暫無規格備註" });
             boilerRecords[newId] = [];
             selectedBoilerId = newId;
             renderBoilerOptions();
@@ -656,6 +692,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             renderBoilerOptions();
             renderHistoryTableAndChart();
+
+            // 監聽輸入即時變更分數與顏色
+            ['inputFlueTemp', 'inputHardness', 'inputDynamicParam'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', checkRealtimeHealth);
+            });
         });
     </script>
 </body>
