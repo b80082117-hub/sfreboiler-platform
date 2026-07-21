@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>碩豐 鍋爐AI診斷與履歷管理平台</title>
+    <title>sfre鍋爐 - 日常巡檢與維修履歷平台</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome 圖示 -->
@@ -16,16 +16,9 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: '#f0f9ff',
                             500: '#0284c7',
                             600: '#0369a1',
                             900: '#0c4a6e',
-                        },
-                        boiler: {
-                            orange: '#f97316',
-                            red: '#ef4444',
-                            green: '#10b981',
-                            blue: '#3b82f6'
                         }
                     }
                 }
@@ -33,20 +26,9 @@
         }
     </script>
     <style>
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     </style>
 </head>
 <body class="h-full flex overflow-hidden font-sans antialiased">
@@ -55,50 +37,40 @@
     <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0">
         <div>
             <!-- Logo 區塊 -->
-            <div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900/50">
-                <i class="fa-solid me-3 text-2xl text-orange-500 fa-fire-flame-curved"></i>
+            <div class="h-16 flex items-center px-4 border-b border-slate-800 bg-slate-900/50 gap-3">
+                <div class="bg-white/90 p-1 rounded">
+                    <img src="https://i.imgur.com/8QZ3X1s.png" alt="sfre logo" class="h-7 object-contain">
+                </div>
                 <div>
-                    <h1 class="font-bold text-lg tracking-wide text-white">sfre</h1>
-                    <p class="text-xs text-slate-400">智慧鍋爐 AI 診斷平台</p>
+                    <h1 class="font-bold text-sm tracking-wide text-white">碩豐AI</h1>
+                    <p class="text-[10px] text-slate-400">巡檢與履歷AI管理平台</p>
                 </div>
             </div>
 
             <!-- 選單項目 -->
             <nav class="p-4 space-y-1">
-                <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors bg-brand-600 text-white">
-                    <i class="fa-solid fa-chart-line w-5"></i> 即時運轉總覽
+                <a href="#" onclick="switchTab('inspection')" id="nav-inspection" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors bg-brand-600 text-white">
+                    <i class="fa-solid fa-clipboard-check w-5 text-sky-400"></i> 日常巡檢填報
                 </a>
-                <a href="#" onclick="switchTab('ai-diagnosis')" id="nav-ai-diagnosis" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
-                    <i class="fa-solid fa-brain w-5 text-purple-400"></i> AI 診斷與健康預測
+                <a href="#" onclick="switchTab('trends')" id="nav-trends" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-chart-line w-5 text-emerald-400"></i> 巡檢數據與趨勢
                 </a>
-                <a href="#" onclick="switchTab('lifecycle')" id="nav-lifecycle" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
-                    <i class="fa-solid fa-id-card w-5 text-emerald-400"></i> 設備履歷與維修
+                <a href="#" onclick="switchTab('maintenance')" id="nav-maintenance" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-wrench w-5 text-amber-400"></i> 維修保養履歷
                 </a>
-                <a href="#" onclick="switchTab('energy')" id="nav-energy" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
-                    <i class="fa-solid fa-leaf w-5 text-green-500"></i> 能效與碳排分析
-                </a>
-                <a href="#" onclick="switchTab('alerts')" id="nav-alerts" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
-                    <i class="fa-solid fa-triangle-exclamation w-5 text-amber-400"></i> 異常告警紀錄
+                <a href="#" onclick="switchTab('reminders')" id="nav-reminders" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-bell w-5 text-purple-400"></i> 巡檢提醒與排程
                 </a>
             </nav>
         </div>
 
         <!-- 底部使用者資訊 -->
         <div class="p-4 border-t border-slate-800 bg-slate-900/30">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="relative">
-                    <span class="w-3 h-3 bg-emerald-500 rounded-full block animate-ping absolute top-0 right-0"></span>
-                    <span class="w-3 h-3 bg-emerald-500 rounded-full block"></span>
-                </div>
-                <span class="text-xs text-slate-300 font-medium">系統連線狀態：正常</span>
-            </div>
-            <div class="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-200">管理</div>
-                    <div class="text-xs">
-                        <p class="text-white font-medium">工程師 站點A</p>
-                        <p class="text-slate-400 text-[10px]">廠區高級管理員</p>
-                    </div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-200">巡診</div>
+                <div class="text-xs">
+                    <p class="text-white font-medium">巡檢員：X工程師</p>
+                    <p class="text-slate-400 text-[10px]">維護組</p>
                 </div>
             </div>
         </div>
@@ -107,216 +79,163 @@
     <!-- 主要內容區塊 -->
     <main class="flex-1 flex flex-col overflow-hidden bg-slate-900">
         
-        <!-- 頂部 Header -->
-        <header class="h-16 border-b border-slate-800 bg-slate-950/40 px-6 flex items-center justify-between shrink-0">
+        <!-- 頂部 Header & 巡檢提醒 Alert Banner -->
+        <header class="border-b border-slate-800 bg-slate-950/40 px-6 py-3 shrink-0 flex flex-col md:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-4">
-                <label for="boilerSelect" class="text-sm font-medium text-slate-300">選擇設備：</label>
-                <select id="boilerSelect" class="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block px-3 py-1.5">
+                <label for="boilerSelect" class="text-sm font-medium text-slate-300">巡檢設備：</label>
+                <select id="boilerSelect" class="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-brand-500 block px-3 py-1.5">
                     <option value="B01">#1 貫流式蒸氣鍋爐 (1.5 Ton/hr)</option>
                     <option value="B02">#2 臥式火管鍋爐 (3.0 Ton/hr)</option>
-                    <option value="B03">#3 廢熱回收鍋爐 (熱泵整合系統)</option>
                 </select>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <i class="fa-solid fa-circle text-[8px] me-1.5"></i> 運轉中 (Running)
-                </span>
             </div>
 
-            <div class="flex items-center gap-4">
-                <span class="text-xs text-slate-400"><i class="fa-regular fa-clock me-1"></i> 即時更新: <span id="clock">--:--:--</span></span>
-                <button onclick="triggerDemoAlert()" class="px-3 py-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md text-xs font-medium hover:bg-amber-500/30 transition-all flex items-center gap-1.5">
-                    <i class="fa-solid fa-bolt"></i> 模擬異常觸發
-                </button>
+            <!-- 巡檢提醒智慧橫幅 -->
+            <div id="reminderBanner" class="flex items-center gap-3 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-xs">
+                <i class="fa-solid fa-clock-rotate-left text-base animate-pulse"></i>
+                <div>
+                    <span class="font-bold">【巡檢提醒】</span>
+                    <span>距離今天「班次巡檢」填報期限剩餘 <strong id="countdownTimer">01:45:00</strong></span>
+                </div>
+                <button onclick="switchTab('inspection')" class="ml-2 px-2.5 py-1 bg-amber-500 text-slate-950 font-bold rounded text-[11px] hover:bg-amber-400">立即填報</button>
             </div>
         </header>
 
-        <!-- 頁籤內容 -->
+        <!-- 頁籤內容區 -->
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
 
-            <!-- TAB 1: 即時運轉總覽 -->
-            <div id="tab-dashboard" class="tab-content space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-medium text-slate-400">蒸氣壓力 (Steam Pressure)</p>
-                                <h3 class="text-2xl font-bold text-white mt-1">0.78 <span class="text-sm font-normal text-slate-400">MPa</span></h3>
-                            </div>
-                            <span class="p-2.5 bg-sky-500/10 text-sky-400 rounded-lg"><i class="fa-solid fa-gauge-high text-lg"></i></span>
-                        </div>
-                        <div class="mt-3 flex items-center text-xs text-emerald-400">
-                            <i class="fa-solid fa-arrow-trend-up me-1"></i> 設定目標 0.80 MPa (穩定)
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-medium text-slate-400">排煙溫度 (Flue Gas Temp)</p>
-                                <h3 class="text-2xl font-bold text-amber-400 mt-1">182.5 <span class="text-sm font-normal text-slate-400">°C</span></h3>
-                            </div>
-                            <span class="p-2.5 bg-amber-500/10 text-amber-400 rounded-lg"><i class="fa-solid fa-temperature-high text-lg"></i></span>
-                        </div>
-                        <div class="mt-3 flex items-center text-xs text-amber-400">
-                            <i class="fa-solid fa-circle-exclamation me-1"></i> 略高於基準值 (+5°C)
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-medium text-slate-400">即時熱效率 (Efficiency)</p>
-                                <h3 class="text-2xl font-bold text-emerald-400 mt-1">92.4 <span class="text-sm font-normal text-slate-400">%</span></h3>
-                            </div>
-                            <span class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fa-solid fa-bolt text-lg"></i></span>
-                        </div>
-                        <div class="mt-3 flex items-center text-xs text-emerald-400">
-                            <i class="fa-solid fa-check me-1"></i> 節能熱泵預熱效益顯著
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-medium text-slate-400">AI 健康度指數 (Health Index)</p>
-                                <h3 class="text-2xl font-bold text-purple-400 mt-1">94 <span class="text-sm font-normal text-slate-400">/ 100</span></h3>
-                            </div>
-                            <span class="p-2.5 bg-purple-500/10 text-purple-400 rounded-lg"><i class="fa-solid fa-heart-pulse text-lg"></i></span>
-                        </div>
-                        <div class="mt-3 flex items-center text-xs text-slate-400">
-                            預估 120 天後建議定期預防維護
-                        </div>
-                    </div>
-                </div>
-
+            <!-- TAB 1: 巡檢資料填報 -->
+            <div id="tab-inspection" class="tab-content space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="font-semibold text-slate-200 flex items-center gap-2">
-                                <i class="fa-solid fa-wave-square text-brand-500"></i> 即時壓力與給水溫度趨勢 (Real-time Trend)
+                    
+                    <!-- 輸入表單 -->
+                    <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/60 rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                <i class="fa-solid fa-pen-to-square text-sky-400"></i> 新增日常巡檢紀錄
                             </h2>
-                            <span class="text-xs text-slate-400">每 5 秒刷新</span>
+                            <span class="text-xs text-slate-400" id="currentDateStr">2026-07-21</span>
                         </div>
-                        <div class="h-72">
-                            <canvas id="realtimeChart"></canvas>
-                        </div>
+
+                        <form id="inspectionForm" onsubmit="submitInspection(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                                <div>
+                                    <label class="block text-slate-300 mb-1">蒸氣壓力 (MPa)</label>
+                                    <input type="number" step="0.01" id="inputPressure" required value="0.78" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <p class="text-[10px] text-slate-500 mt-1">正常範圍：0.70 ~ 0.85 MPa</p>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 mb-1">排煙溫度 (°C)</label>
+                                    <input type="number" step="0.1" id="inputFlueTemp" required value="178.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <p class="text-[10px] text-slate-500 mt-1">預警門檻：> 180 °C</p>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 mb-1">給水預熱溫度 (°C)</label>
+                                    <input type="number" step="0.1" id="inputWaterTemp" required value="58.0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <p class="text-[10px] text-slate-500 mt-1">熱泵預熱正常值：> 50 °C</p>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 mb-1">水質硬度 / 總溶解固體 (ppm)</label>
+                                    <input type="number" id="inputHardness" required value="15" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <p class="text-[10px] text-slate-500 mt-1">軟水標準：< 50 ppm</p>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-slate-700/60 pt-4">
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">現場視覺與聲音檢查項目：</label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                                    <label class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded border border-slate-700/50 cursor-pointer">
+                                        <input type="checkbox" checked class="rounded text-sky-500 focus:ring-0"> 燃燒火焰顏色正常 (藍色)
+                                    </label>
+                                    <label class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded border border-slate-700/50 cursor-pointer">
+                                        <input type="checkbox" checked class="rounded text-sky-500 focus:ring-0"> 泵浦運轉無異常震動異音
+                                    </label>
+                                    <label class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded border border-slate-700/50 cursor-pointer">
+                                        <input type="checkbox" checked class="rounded text-sky-500 focus:ring-0"> 安全閥與水位計無洩漏
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-slate-300 text-xs mb-1">巡檢備註紀錄：</label>
+                                <textarea id="inputNotes" rows="2" placeholder="備註說明（例如：今日更換軟水劑包...）" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-sky-500 focus:outline-none"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-lg transition-all text-xs flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> 儲存並提交巡檢紀錄
+                            </button>
+                        </form>
                     </div>
 
-                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5 flex flex-col justify-between">
+                    <!-- 右側 AI 巡檢分析評估 -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 flex flex-col justify-between">
                         <div>
-                            <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                                <i class="fa-solid fa-shield-halved text-emerald-400"></i> AI 即時診斷短評
+                            <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
+                                <i class="fa-solid fa-microchip text-purple-400"></i> AI 巡檢即時診斷
                             </h2>
+
                             <div class="space-y-4">
-                                <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-700/50">
-                                    <div class="flex items-center justify-between text-xs mb-1">
-                                        <span class="font-semibold text-slate-300">結垢風險 (Scaling Risk)</span>
-                                        <span class="text-emerald-400 font-bold">低 (12%)</span>
-                                    </div>
-                                    <div class="w-full bg-slate-700 rounded-full h-1.5">
-                                        <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 12%"></div>
-                                    </div>
+                                <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700">
+                                    <p class="text-xs text-slate-400">鍋爐當前健康度預估</p>
+                                    <p class="text-2xl font-bold text-emerald-400 mt-1" id="aiHealthScore">96 / 100</p>
+                                    <p class="text-[11px] text-slate-500 mt-1" id="aiHealthDesc">各項巡檢數據落在標準安全範圍內。</p>
                                 </div>
-                                <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-700/50">
-                                    <div class="flex items-center justify-between text-xs mb-1">
-                                        <span class="font-semibold text-slate-300">燃燒空燃比 (Air-Fuel Ratio)</span>
-                                        <span class="text-sky-400 font-bold">最佳 (O2: 3.2%)</span>
+
+                                <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 text-xs space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-400">熱傳導 (結垢風險):</span>
+                                        <span class="text-emerald-400 font-bold" id="aiScalingRisk">極低 (5%)</span>
                                     </div>
-                                    <div class="w-full bg-slate-700 rounded-full h-1.5">
-                                        <div class="bg-sky-500 h-1.5 rounded-full" style="width: 90%"></div>
-                                    </div>
-                                </div>
-                                <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-700/50">
-                                    <div class="flex items-center justify-between text-xs mb-1">
-                                        <span class="font-semibold text-slate-300">給水泵浦振動 (Vibration)</span>
-                                        <span class="text-amber-400 font-bold">微幅偏高 (1.8 mm/s)</span>
-                                    </div>
-                                    <div class="w-full bg-slate-700 rounded-full h-1.5">
-                                        <div class="bg-amber-500 h-1.5 rounded-full" style="width: 45%"></div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-400">排煙熱損失狀態:</span>
+                                        <span class="text-emerald-400 font-bold" id="aiFlueStatus">良好 (92.5% 效率)</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-6 p-3 bg-brand-900/30 border border-brand-500/30 rounded-lg text-xs text-brand-300">
-                            <i class="fa-solid fa-lightbulb text-amber-400 me-1"></i> **AI 智慧建議**：目前運轉狀態良好。預熱水箱由熱泵穩定供水（58°C），可持續維持 92% 以上高熱效率。
+                        <div id="aiAlertNotice" class="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300">
+                            <i class="fa-solid fa-check-circle me-1"></i> 巡檢數據正常，請持續保持定期填報習慣。
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: AI 診斷與健康預測 -->
-            <div id="tab-ai-diagnosis" class="tab-content hidden space-y-6">
+            <!-- TAB 2: 巡檢歷史數據與趨勢圖表 -->
+            <div id="tab-trends" class="tab-content hidden space-y-6">
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
-                    <h2 class="font-semibold text-slate-200 mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-brain text-purple-400"></i> AI 深度診斷模型 & 剩餘壽命 (RUL) 預測
+                    <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期巡檢數據趨勢 (歷史軌跡)
                     </h2>
-                    <p class="text-xs text-slate-400 mb-6">基於物理模型與機器學習模型綜合分析</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/80 text-center">
-                            <p class="text-xs text-slate-400">爐管積碳/結垢預測</p>
-                            <h4 class="text-xl font-bold text-emerald-400 my-2">正常 (輕微)</h4>
-                            <p class="text-[11px] text-slate-500">預估需清洗時間：約 180 天後</p>
-                        </div>
-                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/80 text-center">
-                            <p class="text-xs text-slate-400">關鍵組件：給水泵浦軸承</p>
-                            <h4 class="text-xl font-bold text-amber-400 my-2">RUL: 1,420 小時</h4>
-                            <p class="text-[11px] text-slate-500">建議於下次季保養時更換軸承</p>
-                        </div>
-                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/80 text-center">
-                            <p class="text-xs text-slate-400">耐火磚/絕緣層狀態</p>
-                            <h4 class="text-xl font-bold text-emerald-400 my-2">健康度 96%</h4>
-                            <p class="text-[11px] text-slate-500">無異常散熱損失</p>
-                        </div>
-                    </div>
-
-                    <div class="h-64">
-                        <canvas id="rulChart"></canvas>
+                    <div class="h-72">
+                        <canvas id="inspectionTrendChart"></canvas>
                     </div>
                 </div>
-            </div>
 
-            <!-- TAB 3: 設備履歷與維護 -->
-            <div id="tab-lifecycle" class="tab-content hidden space-y-6">
+                <!-- 歷史巡檢表格 -->
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="font-semibold text-slate-200 flex items-center gap-2">
-                            <i class="fa-solid fa-id-card text-emerald-400"></i> 碩豐鍋爐全生命週期履歷 (Equipment Lifecycle)
-                        </h2>
-                    </div>
-
-                    <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-700/60 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                        <div><span class="text-slate-400">設備編號:</span> <span class="text-slate-200 font-mono">SF-BLR-2024-01</span></div>
-                        <div><span class="text-slate-400">製造商:</span> <span class="text-slate-200">碩豐熱能科技</span></div>
-                        <div><span class="text-slate-400">安裝日期:</span> <span class="text-slate-200">2024-03-15</span></div>
-                        <div><span class="text-slate-400">累計運轉時數:</span> <span class="text-slate-200 font-mono">8,420 小時</span></div>
-                    </div>
-
+                    <h3 class="font-semibold text-slate-200 mb-3 text-sm">歷史巡檢紀錄表</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs text-slate-300">
                             <thead class="bg-slate-900/80 text-slate-400 border-b border-slate-700">
                                 <tr>
-                                    <th class="p-3">保養日期</th>
-                                    <th class="p-3">項目種類</th>
-                                    <th class="p-3">服務內容與更換零件</th>
-                                    <th class="p-3">負責工程師</th>
-                                    <th class="p-3">狀態</th>
+                                    <th class="p-2.5">日期/時間</th>
+                                    <th class="p-2.5">蒸氣壓力</th>
+                                    <th class="p-2.5">排煙溫度</th>
+                                    <th class="p-2.5">給水溫度</th>
+                                    <th class="p-2.5">水質硬度</th>
+                                    <th class="p-2.5">巡檢員</th>
+                                    <th class="p-2.5">狀態</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-700/50">
+                            <tbody id="inspectionHistoryBody" class="divide-y divide-slate-700/50">
                                 <tr>
-                                    <td class="p-3">2026-06-10</td>
-                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">定期檢驗</span></td>
-                                    <td class="p-3">年度勞檢安全閥測試、壓力容器超音波探傷測厚</td>
-                                    <td class="p-3">林工程師 (碩豐原廠)</td>
-                                    <td class="p-3 text-emerald-400"><i class="fa-solid fa-circle-check me-1"></i> 合格通過</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3">2026-03-22</td>
-                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">預防性保養</span></td>
-                                    <td class="p-3">更換給水軟水器樹脂、校正水位計與電極棒</td>
-                                    <td class="p-3">張技術員</td>
-                                    <td class="p-3 text-slate-400">已完工</td>
+                                    <td class="p-2.5">2026-07-20 09:00</td>
+                                    <td class="p-2.5">0.77 MPa</td>
+                                    <td class="p-2.5">177.0 °C</td>
+                                    <td class="p-2.5">57.5 °C</td>
+                                    <td class="p-2.5">12 ppm</td>
+                                    <td class="p-2.5">張工程師</td>
+                                    <td class="p-2.5 text-emerald-400">正常</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -324,34 +243,92 @@
                 </div>
             </div>
 
-            <!-- TAB 4: 能效與碳排分析 -->
-            <div id="tab-energy" class="tab-content hidden space-y-6">
+            <!-- TAB 3: 維修保養履歷卡 -->
+            <div id="tab-maintenance" class="tab-content hidden space-y-6">
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
-                    <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-leaf text-green-500"></i> 能耗效益與減碳追蹤 (ESG Dashboard)
-                    </h2>
-                    <div class="h-72">
-                        <canvas id="energyChart"></canvas>
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-wrench text-amber-400"></i> 設備維修與保養工單紀錄
+                        </h2>
+                        <button onclick="toggleMaintenanceForm()" class="px-3 py-1.5 bg-amber-600 text-white rounded text-xs hover:bg-amber-500 transition-all flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> 新增維修/保養工單
+                        </button>
+                    </div>
+
+                    <!-- 新增維修表單 (預設隱藏) -->
+                    <div id="maintenanceFormBox" class="hidden mb-6 p-4 bg-slate-900/90 rounded-lg border border-amber-500/30">
+                        <h3 class="text-xs font-bold text-amber-300 mb-3">填寫保養維修紀錄</h3>
+                        <form onsubmit="submitMaintenance(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                            <input type="date" required id="maintDate" class="bg-slate-800 border border-slate-700 p-2 rounded text-slate-200">
+                            <select id="maintType" class="bg-slate-800 border border-slate-700 p-2 rounded text-slate-200">
+                                <option value="預防性保養">預防性保養</option>
+                                <option value="故障維修">故障維修</option>
+                                <option value="定期法定檢測">定期法定檢測</option>
+                            </select>
+                            <input type="text" id="maintEngineer" required placeholder="負責工程師 / 廠商" class="bg-slate-800 border border-slate-700 p-2 rounded text-slate-200">
+                            <input type="text" id="maintDesc" required placeholder="保養與更換零件說明" class="md:col-span-2 bg-slate-800 border border-slate-700 p-2 rounded text-slate-200">
+                            <button type="submit" class="bg-amber-600 text-white font-bold p-2 rounded hover:bg-amber-500">保存歸檔</button>
+                        </form>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900/80 text-slate-400 border-b border-slate-700">
+                                <tr>
+                                    <th class="p-3">日期</th>
+                                    <th class="p-3">類別</th>
+                                    <th class="p-3">維修與保養內容說明</th>
+                                    <th class="p-3">維護人員 / 廠商</th>
+                                    <th class="p-3">狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maintenanceTableBody" class="divide-y divide-slate-700/50">
+                                <tr>
+                                    <td class="p-3">2026-06-10</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">定期檢測</span></td>
+                                    <td class="p-3">年度鍋爐安全閥壓力測試與超音波爐壁測厚作業</td>
+                                    <td class="p-3">碩豐原廠服務團隊</td>
+                                    <td class="p-3 text-emerald-400"><i class="fa-solid fa-check me-1"></i> 已完工</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">2026-03-15</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">預防性保養</span></td>
+                                    <td class="p-3">更換軟水設備陽離子樹脂、軟水計電極保養清潔</td>
+                                    <td class="p-3">張工程師</td>
+                                    <td class="p-3 text-emerald-400"><i class="fa-solid fa-check me-1"></i> 已完工</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 5: 異常告警紀錄 -->
-            <div id="tab-alerts" class="tab-content hidden space-y-6">
+            <!-- TAB 4: 巡檢提醒與排程設定 -->
+            <div id="tab-reminders" class="tab-content hidden space-y-6">
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
                     <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> 歷史與即時告警紀錄
+                        <i class="fa-solid fa-bell text-purple-400"></i> 智慧巡檢提醒與週期設定
                     </h2>
-                    <div class="space-y-3" id="alertContainer">
-                        <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center justify-between text-xs">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-circle-exclamation text-amber-400 text-base"></i>
-                                <div>
-                                    <p class="text-slate-200 font-medium">排煙溫度稍微過高警告 (Flue Temp High)</p>
-                                    <p class="text-slate-400">當前數值: 182.5 °C (預設警戒值: 180.0 °C)</p>
-                                </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                        <div class="p-4 bg-slate-900/60 rounded-lg border border-slate-700 space-y-3">
+                            <h3 class="font-bold text-slate-200">每日巡檢時段設定</h3>
+                            <div class="flex items-center justify-between p-2 bg-slate-800 rounded">
+                                <span>早班巡檢提醒 (09:00)</span>
+                                <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded text-[10px]">已啟用</span>
                             </div>
-                            <span class="text-slate-400 font-mono">15:28:12</span>
+                            <div class="flex items-center justify-between p-2 bg-slate-800 rounded">
+                                <span>晚班巡檢提醒 (17:00)</span>
+                                <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded text-[10px]">已啟用</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-900/60 rounded-lg border border-slate-700 space-y-2">
+                            <h3 class="font-bold text-slate-200">逾期未巡檢通知機制</h3>
+                            <p class="text-slate-400">若超過設定時段 30 分鐘未完成數據填報，系統將自動向 Line / 簡訊 推送提醒。</p>
+                            <label class="flex items-center gap-2 mt-3 cursor-pointer">
+                                <input type="checkbox" checked class="rounded text-sky-500"> 啟用 Line 巡檢提醒通知
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -361,6 +338,13 @@
     </main>
 
     <script>
+        // 初始化數據
+        const trendLabels = ['07/16', '07/17', '07/18', '07/19', '07/20'];
+        const pressureData = [0.76, 0.77, 0.78, 0.76, 0.77];
+        const flueTempData = [175, 176, 178, 177, 177];
+
+        let trendChart;
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => {
@@ -370,56 +354,120 @@
 
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
             const activeNav = document.getElementById(`nav-${tabId}`);
-            activeNav.classList.add('bg-brand-600', 'text-white');
-            activeNav.classList.remove('text-slate-400');
+            if (activeNav) {
+                activeNav.classList.add('bg-brand-600', 'text-white');
+                activeNav.classList.remove('text-slate-400');
+            }
         }
 
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleString('zh-TW', { hour12: false });
-        }, 1000);
+        function submitInspection(e) {
+            e.preventDefault();
+            const pressure = parseFloat(document.getElementById('inputPressure').value);
+            const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value);
+            const waterTemp = parseFloat(document.getElementById('inputWaterTemp').value);
+            const hardness = parseInt(document.getElementById('inputHardness').value);
+            const notes = document.getElementById('inputNotes').value;
 
-        function triggerDemoAlert() {
-            const container = document.getElementById('alertContainer');
-            const newAlert = document.createElement('div');
-            const timeStr = new Date().toLocaleTimeString('zh-TW', { hour12: false });
-            
-            newAlert.className = 'p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center justify-between text-xs animate-pulse';
-            newAlert.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-triangle-exclamation text-red-400 text-base"></i>
-                    <div>
-                        <p class="text-slate-200 font-medium">AI 預測異常：給水泵浦頻譜振動異常上升</p>
-                        <p class="text-slate-400">即時振動值: 2.4 mm/s (觸發 AI 預警門檻)</p>
-                    </div>
-                </div>
-                <span class="text-slate-400 font-mono">${timeStr}</span>
+            const now = new Date();
+            const timeStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            // 1. 更新圖表
+            trendLabels.push(`${now.getMonth()+1}/${now.getDate()}`);
+            pressureData.push(pressure);
+            flueTempData.push(flueTemp);
+            if (trendLabels.length > 7) {
+                trendLabels.shift(); pressureData.shift(); flueTempData.shift();
+            }
+            trendChart.update();
+
+            // 2. 新增到歷史表格
+            const tbody = document.getElementById('inspectionHistoryBody');
+            const newRow = document.createElement('tr');
+            newRow.className = "bg-sky-500/10";
+            newRow.innerHTML = `
+                <td class="p-2.5">${timeStr}</td>
+                <td class="p-2.5">${pressure} MPa</td>
+                <td class="p-2.5">${flueTemp} °C</td>
+                <td class="p-2.5">${waterTemp} °C</td>
+                <td class="p-2.5">${hardness} ppm</td>
+                <td class="p-2.5">張工程師</td>
+                <td class="p-2.5 text-emerald-400">已填報</td>
             `;
-            container.prepend(newAlert);
-            alert("⚠️ 模擬告警已觸發！請至「異常告警紀錄」頁籤查看詳情。");
+            tbody.prepend(newRow);
+
+            // 3. AI 診斷判斷邏輯
+            const scoreEl = document.getElementById('aiHealthScore');
+            const descEl = document.getElementById('aiHealthDesc');
+            const noticeEl = document.getElementById('aiAlertNotice');
+
+            if (flueTemp > 180 || hardness > 50) {
+                scoreEl.innerText = "82 / 100";
+                scoreEl.className = "text-2xl font-bold text-amber-400 mt-1";
+                descEl.innerText = "檢測到排煙溫度偏高或水質過硬，可能引發爐管結垢與熱效率下降。";
+                noticeEl.className = "mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300";
+                noticeEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> AI 警示：排煙溫度即將超出標準 ($180^\\circ\\text{C}$)，建議檢查燃燒器或安排保養。`;
+            } else {
+                scoreEl.innerText = "98 / 100";
+                scoreEl.className = "text-2xl font-bold text-emerald-400 mt-1";
+                descEl.innerText = "今日數據優良，設備運轉處於最佳能效狀態。";
+                noticeEl.className = "mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300";
+                noticeEl.innerHTML = `<i class="fa-solid fa-check-circle me-1"></i> 本次巡檢成功！數據已存入設備履歷庫。`;
+            }
+
+            // 4. 更新頂部巡檢提醒橫幅狀態
+            const banner = document.getElementById('reminderBanner');
+            banner.className = "flex items-center gap-3 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-300 text-xs";
+            banner.innerHTML = `<i class="fa-solid fa-circle-check text-base"></i><span>【巡檢完成】今日班次巡檢已順利完成填報！</span>`;
+
+            alert("✅ 巡檢紀錄提交成功！數據已同步至趨勢圖表與 AI 診斷。");
+        }
+
+        function toggleMaintenanceForm() {
+            document.getElementById('maintenanceFormBox').classList.toggle('hidden');
+        }
+
+        function submitMaintenance(e) {
+            e.preventDefault();
+            const date = document.getElementById('maintDate').value;
+            const type = document.getElementById('maintType').value;
+            const engineer = document.getElementById('maintEngineer').value;
+            const desc = document.getElementById('maintDesc').value;
+
+            const tbody = document.getElementById('maintenanceTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="p-3">${date}</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">${type}</span></td>
+                <td class="p-3">${desc}</td>
+                <td class="p-3">${engineer}</td>
+                <td class="p-3 text-emerald-400"><i class="fa-solid fa-check me-1"></i> 已完工</td>
+            `;
+            tbody.prepend(row);
+            document.getElementById('maintenanceFormBox').classList.add('hidden');
+            alert("✅ 維修保養工單已歸檔至設備履歷！");
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const ctx1 = document.getElementById('realtimeChart').getContext('2d');
-            new Chart(ctx1, {
+            const ctx = document.getElementById('inspectionTrendChart').getContext('2d');
+            trendChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['15:20', '15:22', '15:24', '15:26', '15:28', '15:30'],
+                    labels: trendLabels,
                     datasets: [
+                        {
+                            label: '排煙溫度 (°C)',
+                            data: flueTempData,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        },
                         {
                             label: '蒸氣壓力 (MPa)',
-                            data: [0.75, 0.76, 0.78, 0.77, 0.79, 0.78],
+                            data: pressureData,
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: '熱泵預熱給水溫度 (°C)',
-                            data: [55, 56, 58, 57, 58, 59],
-                            borderColor: '#10b981',
-                            backgroundColor: 'transparent',
-                            borderDash: [5, 5],
+                            yAxisID: 'y',
                             tension: 0.3
                         }
                     ]
@@ -430,61 +478,8 @@
                     plugins: { legend: { labels: { color: '#94a3b8' } } },
                     scales: {
                         x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
-                    }
-                }
-            });
-
-            const ctx2 = document.getElementById('rulChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: ['現在', '1個月後', '2個月後', '3個月後', '4個月後', '5個月後'],
-                    datasets: [{
-                        label: '給水泵浦健康衰減預測曲線',
-                        data: [94, 88, 81, 72, 60, 45],
-                        borderColor: '#a855f7',
-                        backgroundColor: 'rgba(168, 85, 247, 0.15)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#94a3b8' } } },
-                    scales: {
-                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
-                    }
-                }
-            });
-
-            const ctx3 = document.getElementById('energyChart').getContext('2d');
-            new Chart(ctx3, {
-                type: 'bar',
-                data: {
-                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-                    datasets: [
-                        {
-                            label: '天然氣消耗量 (m³)',
-                            data: [320, 310, 290, 305, 315, 180, 150],
-                            backgroundColor: '#0284c7'
-                        },
-                        {
-                            label: '透過熱泵節省之天然氣 (m³)',
-                            data: [45, 42, 48, 46, 44, 25, 20],
-                            backgroundColor: '#10b981'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#94a3b8' } } },
-                    scales: {
-                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                        y: { type: 'linear', position: 'left', grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#f59e0b' } }
                     }
                 }
             });
