@@ -491,23 +491,72 @@
                 </div>
             </div>
 
-            <!-- TAB 4: 巡檢提醒與排程 -->
+            <!-- TAB 4: 巡檢提醒與排程 (可操作互動版) -->
             <div id="tab-reminders" class="tab-content hidden space-y-6">
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg space-y-4">
-                    <h2 class="font-bold text-slate-100 text-base flex items-center gap-2">
-                        <i class="fa-solid fa-bell text-purple-400"></i> 巡檢提醒與定期排程
-                    </h2>
-                    <p class="text-xs text-slate-400">設定定時提醒，確保班別與週期巡檢零漏報。</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
-                        <div class="p-4 bg-slate-900 rounded-lg border border-slate-700 space-y-2">
-                            <h3 class="font-bold text-sky-400 text-sm">每日巡檢時間</h3>
-                            <p class="text-slate-300">建議時段：每班次開工前（08:00 / 16:00 / 00:00）</p>
-                            <span class="inline-block bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] border border-emerald-500/30">系統已啟用推播提醒</span>
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-lg space-y-6">
+                    <div class="flex justify-between items-center border-b border-slate-700/80 pb-4">
+                        <div>
+                            <h2 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-bell text-purple-400"></i> 巡檢提醒與定期排程設定
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">設定定時提醒與法定檢驗排程，確保班別與週期巡檢零漏報。</p>
                         </div>
-                        <div class="p-4 bg-slate-900 rounded-lg border border-slate-700 space-y-2">
-                            <h3 class="font-bold text-purple-400 text-sm">定期大修排程</h3>
-                            <p class="text-slate-300">下一次法定定檢：2026-11-15（剩餘 117 天）</p>
-                            <span class="inline-block bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-[10px] border border-purple-500/30">排程進行中</span>
+                        <button onclick="saveReminderSettings()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-md shadow-purple-600/20 transition-all">
+                            <i class="fa-solid fa-floppy-disk"></i> 儲存設定
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                        <!-- 每日巡檢提醒 -->
+                        <div class="p-4 bg-slate-900/90 rounded-xl border border-slate-700/80 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <h3 class="font-bold text-sky-400 text-sm flex items-center gap-2">
+                                    <i class="fa-regular fa-clock"></i> 每日巡檢提醒設定
+                                </h3>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="reminderToggle" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-500"></div>
+                                </label>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-slate-300 mb-1">提醒時間</label>
+                                    <input type="time" id="reminderTime" value="08:00" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-slate-100 text-sm focus:border-sky-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 mb-1">提示訊息文字</label>
+                                    <input type="text" id="reminderText" value="請記得執行今日設備日常巡檢填報" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                </div>
+                                <div class="pt-1">
+                                    <button onclick="testNotification()" class="w-full bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5 text-xs">
+                                        <i class="fa-solid fa-vial"></i> 測試瀏覽器通知推播
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 法定定檢與大修排程 -->
+                        <div class="p-4 bg-slate-900/90 rounded-xl border border-slate-700/80 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <h3 class="font-bold text-purple-400 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-calendar-check"></i> 法定定檢 / 大修排程
+                                </h3>
+                                <span id="nextCheckDaysBadge" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded text-[10px] font-mono">
+                                    計算中...
+                                </span>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-slate-300 mb-1">下次法定定檢日期</label>
+                                    <input type="date" id="nextCheckDate" value="2026-11-15" onchange="calculateRemainingDays()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-slate-100 text-sm focus:border-purple-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 mb-1">檢查項目 / 機構備註</label>
+                                    <input type="text" id="nextCheckNote" value="中華民國鍋爐協會 法定定期檢查" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-purple-500 focus:outline-none">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -528,7 +577,7 @@
     <script>
         // 1. 初始化資料與狀態
         let boilers = JSON.parse(localStorage.getItem('sf_boilers')) || [
-            { id: 'b1', name: '#1 貫流式鍋爐 (1.0 Ton/hr)', type: 'steam', detail: '型号: SF-1000Steam | 額定蒸氣壓: 0.8 MPa' },
+            { id: 'b1', name: '#1 貫流式鍋爐 (1.0 Ton/hr)', type: 'steam', detail: '型號: SF-1000Steam | 額定蒸氣壓: 0.8 MPa' },
             { id: 'b2', name: '#2 熱水鍋爐 (50萬 Kcal)', type: 'hotwater', detail: '型號: SF-500HW | 常用出水溫: 85°C' }
         ];
         let currentBoilerId = localStorage.getItem('sf_current_boiler') || boilers[0].id;
@@ -548,6 +597,14 @@
             { id: 'm1', boilerId: 'b1', date: '2026-07-15', type: '定期保養', title: '燃燒機噴嘴清洗與濾網更換', status: '已完成', tech: '碩豐工程-陳技師', cost: 3500, notes: '運轉正常', photoBefore: '', photoAfter: '' }
         ];
 
+        let reminderConfig = JSON.parse(localStorage.getItem('sf_reminder_config')) || {
+            enabled: true,
+            time: '08:00',
+            text: '請記得執行今日設備日常巡檢填報',
+            nextCheckDate: '2026-11-15',
+            nextCheckNote: '中華民國鍋爐協會 法定定期檢查'
+        };
+
         let trendChart = null;
 
         // 初始化頁面
@@ -559,6 +616,7 @@
             updateUIByCurrentBoiler();
             renderMaintenanceTable();
             initChart();
+            initReminderUI();
         });
 
         // 切換側邊欄 (手機版)
@@ -633,7 +691,7 @@
             document.getElementById('editBoilerType').value = b.type;
             document.getElementById('editBoilerDetail').value = b.detail || '';
 
-            // 動態標籤改變 (蒸氣壓 / 熱水溫)
+            // 動態標籤改變
             const isSteam = b.type === 'steam';
             const labelText = isSteam ? '蒸氣壓力 (MPa)' : '熱水出水溫度 (°C)';
             document.getElementById('lblDynamicParam').innerText = labelText;
@@ -700,9 +758,7 @@
             inspectionRecords[currentBoilerId].unshift(record);
             localStorage.setItem('sf_inspections', JSON.stringify(inspectionRecords));
 
-            // AI 簡化診斷邏輯
             calculateAIDiagnosis(flueTemp);
-
             renderInspectionHistory();
             updateChart();
             alert('巡檢紀錄已成功儲存！');
@@ -787,7 +843,6 @@
             alert('維修工單建立成功！');
             e.target.reset();
             
-            // 重置預覽
             document.getElementById('previewBeforeImg').classList.add('hidden');
             document.getElementById('previewBeforePlaceholder').classList.remove('hidden');
             document.getElementById('previewAfterImg').classList.add('hidden');
@@ -798,7 +853,6 @@
         function renderMaintenanceTable() {
             const filtered = maintenanceRecords.filter(m => m.boilerId === currentBoilerId);
             
-            // 計算 KPI
             const totalCount = filtered.length;
             const pendingCount = filtered.filter(m => m.status !== '已完成').length;
             const completedCount = filtered.filter(m => m.status === '已完成').length;
@@ -846,7 +900,77 @@
             }
         }
 
-        // Modal 照片放大查看
+        // 巡檢提醒與排程邏輯
+        function initReminderUI() {
+            document.getElementById('reminderToggle').checked = reminderConfig.enabled;
+            document.getElementById('reminderTime').value = reminderConfig.time || '08:00';
+            document.getElementById('reminderText').value = reminderConfig.text || '';
+            document.getElementById('nextCheckDate').value = reminderConfig.nextCheckDate || '2026-11-15';
+            document.getElementById('nextCheckNote').value = reminderConfig.nextCheckNote || '';
+
+            calculateRemainingDays();
+        }
+
+        function calculateRemainingDays() {
+            const targetVal = document.getElementById('nextCheckDate').value;
+            if (!targetVal) return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const targetDate = new Date(targetVal);
+            
+            const diffTime = targetDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            const badge = document.getElementById('nextCheckDaysBadge');
+            if (diffDays > 0) {
+                badge.innerText = `剩餘 ${diffDays} 天`;
+                badge.className = "bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded text-[10px] font-mono";
+            } else if (diffDays === 0) {
+                badge.innerText = `今日即為定檢日！`;
+                badge.className = "bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-mono animate-pulse";
+            } else {
+                badge.innerText = `已逾期 ${Math.abs(diffDays)} 天`;
+                badge.className = "bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-mono";
+            }
+        }
+
+        function testNotification() {
+            if (!("Notification" in window)) {
+                alert("此瀏覽器不支援桌面推播通知機能。");
+                return;
+            }
+
+            if (Notification.permission === "granted") {
+                new Notification("碩豐熱能 巡檢提醒 (測試)", {
+                    body: document.getElementById('reminderText').value || '請記得填報巡檢紀錄',
+                    icon: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png'
+                });
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        testNotification();
+                    }
+                });
+            } else {
+                alert("您已停用通知權限，請於瀏覽器網址列設定中開啟權限。");
+            }
+        }
+
+        function saveReminderSettings() {
+            reminderConfig = {
+                enabled: document.getElementById('reminderToggle').checked,
+                time: document.getElementById('reminderTime').value,
+                text: document.getElementById('reminderText').value,
+                nextCheckDate: document.getElementById('nextCheckDate').value,
+                nextCheckNote: document.getElementById('nextCheckNote').value
+            };
+
+            localStorage.setItem('sf_reminder_config', JSON.stringify(reminderConfig));
+            alert('巡檢提醒與排程設定已成功更新！');
+        }
+
+        // Modal 照片查看
         function openImageModal(src) {
             document.getElementById('modalImg').src = src;
             document.getElementById('imageModal').classList.remove('hidden');
