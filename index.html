@@ -120,7 +120,6 @@
                 </button>
             </div>
 
-            <!-- 修改巡檢員小表單 -->
             <div id="inspectorFormBox" class="hidden mt-3 pt-2 border-t border-slate-800 space-y-2 text-xs">
                 <div>
                     <label class="block text-[10px] text-slate-400">巡檢員姓名：</label>
@@ -174,7 +173,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- 輸入表單 -->
+                    <!-- 輸入表單 (使用 step="any" 解決有效值警告) -->
                     <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/60 rounded-xl p-6">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
@@ -185,22 +184,22 @@
 
                         <form id="inspectionForm" onsubmit="submitInspection(event)" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                                <!-- 動態切換欄位：蒸氣壓力 vs 熱水溫度 -->
                                 <div>
                                     <label id="lblDynamicParam" class="block text-slate-300 mb-1">蒸氣壓力 (MPa)</label>
-                                    <input type="number" step="0.1" id="inputDynamicParam" required value="0.78" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <input type="number" step="any" id="inputDynamicParam" required value="0.78" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-slate-300 mb-1">排煙溫度 (°C)</label>
-                                    <input type="number" step="0.1" id="inputFlueTemp" required value="178.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <input type="number" step="any" id="inputFlueTemp" required value="178.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-slate-300 mb-1">給水預熱溫度 (°C)</label>
-                                    <input type="number" step="0.1" id="inputWaterTemp" required value="58.0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <!-- 已修正為「給水溫度 (°C)」 -->
+                                    <label class="block text-slate-300 mb-1">給水溫度 (°C)</label>
+                                    <input type="number" step="any" id="inputWaterTemp" required value="58.0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-slate-300 mb-1">水質硬度 (ppm)</label>
-                                    <input type="number" id="inputHardness" required value="15" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <input type="number" step="any" id="inputHardness" required value="15" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-sky-500 focus:outline-none">
                                 </div>
                             </div>
 
@@ -253,17 +252,17 @@
 
             <!-- TAB 2: 巡檢歷史數據與趨勢圖表 -->
             <div id="tab-trends" class="tab-content hidden space-y-6">
-                <!-- 1. 曲線高度縮小 (h-52 縮小高度版面) -->
+                <!-- 圖表容器高度縮小至 h-44 (176px)，支援多條數據曲線顯示 -->
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
                     <h2 class="font-semibold text-slate-200 mb-2 flex items-center gap-2 text-sm">
-                        <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期巡檢數據趨勢
+                        <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期巡檢數據綜合趨勢圖
                     </h2>
-                    <div class="relative w-full h-52">
+                    <div class="relative w-full h-44">
                         <canvas id="inspectionTrendChart"></canvas>
                     </div>
                 </div>
 
-                <!-- 2. 下方數據對照表版面拉大、動態欄位適應 -->
+                <!-- 下方對照表版面 -->
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 shadow-lg">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-slate-100 text-base flex items-center gap-2">
@@ -283,7 +282,6 @@
                                 </tr>
                             </thead>
                             <tbody id="inspectionHistoryBody" class="divide-y divide-slate-700/60 font-mono">
-                                <!-- 由 JavaScript 動態生成對應資料 -->
                             </tbody>
                         </table>
                     </div>
@@ -309,14 +307,14 @@
     </main>
 
     <script>
-        // 設備列表 (預設支援蒸氣與熱水兩種種類)
+        // 設備列表
         let boilers = [
             { id: "B01", name: "#1 貫流式蒸氣鍋爐 (1.5 Ton/hr)", type: "steam", detail: "型號: SF-1500, 常用壓力: 0.8 MPa" },
             { id: "B02", name: "#2 臥式火管鍋爐 (3.0 Ton/hr)", type: "steam", detail: "型號: SF-3000H, 常用壓力: 0.75 MPa" },
             { id: "B03", name: "#1 專用高溫熱水鍋爐", type: "hotwater", detail: "型號: HW-5000, 出水設定溫度: 85 °C" }
         ];
 
-        // 各設備的歷史巡檢紀錄資料
+        // 各設備巡檢紀錄
         let boilerRecords = {
             "B01": [
                 { date: '07/17', flueTemp: 176.0, dynamicVal: 0.76, waterTemp: 56.0, inspector: '張工程師' },
@@ -381,7 +379,7 @@
                 badge.className = "text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium me-2";
                 dynamicLabel.innerText = "熱水出水溫度 (°C)";
                 if (thDynamic) thDynamic.innerText = "熱水溫度 (°C)";
-                dynamicInput.value = "85.0";
+                dynamicInput.value = "85";
             } else {
                 badge.innerText = "蒸氣鍋爐";
                 badge.className = "text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full font-medium me-2";
@@ -449,7 +447,7 @@
             const records = boilerRecords[selectedBoilerId] || [];
             const isHotWater = current && current.type === 'hotwater';
 
-            // 1. 更新歷史對照表 (加大版面)
+            // 1. 更新對照表
             const tbody = document.getElementById('inspectionHistoryBody');
             tbody.innerHTML = '';
 
@@ -464,20 +462,53 @@
                         <td class="p-3.5 font-medium text-slate-200">${r.date}</td>
                         <td class="p-3.5 text-amber-400 font-bold">${r.flueTemp} °C</td>
                         <td class="p-3.5 text-sky-400 font-semibold">${r.dynamicVal} ${unitStr}</td>
-                        <td class="p-3.5">${r.waterTemp} °C</td>
+                        <td class="p-3.5 text-emerald-400 font-semibold">${r.waterTemp} °C</td>
                         <td class="p-3.5 text-slate-300 font-sans">${r.inspector}</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            // 2. 更新趨勢圖表
+            // 2. 更新趨勢圖表 (多條曲線：排煙溫度 + 給水溫度 + 蒸氣壓力/熱水溫度)
             const labels = records.map(r => r.date);
             const flueTemps = records.map(r => r.flueTemp);
+            const waterTemps = records.map(r => r.waterTemp);
+            const dynamicVals = records.map(r => r.dynamicVal);
+            const dynamicLabelText = isHotWater ? '熱水溫度 (°C)' : '蒸氣壓力 (MPa)';
+
+            const chartDatasets = [
+                {
+                    label: '排煙溫度 (°C)',
+                    data: flueTemps,
+                    borderColor: '#f59e0b', // 琥珀黃
+                    backgroundColor: '#f59e0b',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    tension: 0.2
+                },
+                {
+                    label: '給水溫度 (°C)',
+                    data: waterTemps,
+                    borderColor: '#10b981', // 翡翠綠
+                    backgroundColor: '#10b981',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    tension: 0.2
+                },
+                {
+                    label: dynamicLabelText,
+                    data: dynamicVals,
+                    borderColor: '#38bdf8', // 天藍
+                    backgroundColor: '#38bdf8',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    tension: 0.2
+                }
+            ];
 
             if (trendChart) {
                 trendChart.data.labels = labels;
-                trendChart.data.datasets[0].data = flueTemps;
+                trendChart.data.datasets = chartDatasets;
                 trendChart.update();
             } else {
                 const ctx = document.getElementById('inspectionTrendChart').getContext('2d');
@@ -485,33 +516,24 @@
                     type: 'line',
                     data: {
                         labels: labels,
-                        datasets: [{
-                            label: '排煙溫度 (°C)',
-                            data: flueTemps,
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.12)',
-                            borderWidth: 2.5,
-                            pointBackgroundColor: '#f59e0b',
-                            pointRadius: 4,
-                            tension: 0.25,
-                            fill: true
-                        }]
+                        datasets: chartDatasets
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                labels: { color: '#cbd5e1', font: { size: 11 } }
+                                position: 'top',
+                                labels: { color: '#cbd5e1', font: { size: 11 }, boxWidth: 12 }
                             }
                         },
                         scales: {
                             x: {
-                                grid: { color: 'rgba(51, 65, 85, 0.4)' },
+                                grid: { color: 'rgba(51, 65, 85, 0.3)' },
                                 ticks: { color: '#94a3b8', font: { size: 10 } }
                             },
                             y: {
-                                grid: { color: 'rgba(51, 65, 85, 0.4)' },
+                                grid: { color: 'rgba(51, 65, 85, 0.3)' },
                                 ticks: { color: '#94a3b8', font: { size: 10 } }
                             }
                         }
