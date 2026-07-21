@@ -175,10 +175,9 @@
 
             <!-- TAB 1: 巡檢資料填報 -->
             <div id="tab-inspection" class="tab-content space-y-6">
-                <!-- 調整 Grid 比例為 5 欄：加大輸入表單 (佔 4 欄)，縮小 AI 診斷 (佔 1 欄) -->
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                     
-                    <!-- 輸入表單 (lg:col-span-4 加大區域) -->
+                    <!-- 輸入表單 -->
                     <div class="lg:col-span-4 bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-md">
                         <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-700">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2 text-base">
@@ -233,12 +232,11 @@
                         </form>
                     </div>
 
-                    <!-- AI 即時診斷卡片 (lg:col-span-1 縮小精簡區塊) -->
+                    <!-- AI 即時診斷卡片 -->
                     <div class="lg:col-span-1 bg-gradient-to-b from-slate-800/90 to-slate-900/90 border border-purple-500/30 rounded-xl p-4 shadow-xl flex flex-col justify-between relative overflow-hidden">
                         <div class="absolute -right-10 -top-10 w-28 h-28 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
                         <div class="space-y-3">
-                            <!-- 精簡標頭 -->
                             <div class="flex items-center justify-between pb-2 border-b border-slate-700/80">
                                 <h2 class="font-bold text-slate-100 flex items-center gap-1.5 text-xs">
                                     <i class="fa-solid fa-brain text-purple-400 text-sm"></i> AI 巡檢診斷
@@ -246,7 +244,6 @@
                                 <span class="text-[9px] text-purple-300 bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30 font-mono">LIVE</span>
                             </div>
 
-                            <!-- 儀表板核心區塊 -->
                             <div class="bg-slate-950/70 rounded-lg p-3 border border-slate-800 text-center space-y-2">
                                 <div class="flex justify-between items-center text-[11px] text-slate-400">
                                     <span>健康指數</span>
@@ -256,13 +253,11 @@
                                     </span>
                                 </div>
 
-                                <!-- 大型數字顯示區 -->
                                 <div class="py-1 flex items-center justify-center gap-0.5">
                                     <span id="aiHealthScore" class="text-4xl font-black tracking-tight text-emerald-400 drop-shadow-md">96</span>
                                     <span class="text-xs font-semibold text-slate-500 self-end mb-1">/100分</span>
                                 </div>
 
-                                <!-- 全寬動態進度條 -->
                                 <div class="space-y-1">
                                     <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-700">
                                         <div id="aiHealthBar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500" style="width: 96%;"></div>
@@ -276,7 +271,6 @@
                             </div>
                         </div>
 
-                        <!-- 下方即時診斷建議 / 警示訊息區塊 -->
                         <div id="aiAlertNotice" class="mt-3 p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-[11px] text-emerald-300 flex items-start gap-2 transition-all">
                             <i id="aiAlertIcon" class="fa-solid fa-circle-check text-sm shrink-0 mt-0.5 text-emerald-400"></i>
                             <div class="space-y-0.5">
@@ -325,12 +319,141 @@
                 </div>
             </div>
 
-            <!-- TAB 3: 維修保養履歷 -->
+            <!-- TAB 3: 維修保養履歷 (完整強化版) -->
             <div id="tab-maintenance" class="tab-content hidden space-y-6">
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5">
-                    <h2 class="font-semibold text-slate-200 mb-4">維修與保養工單紀錄</h2>
-                    <p class="text-xs text-slate-400">提供完整全生命週期保養紀錄管理。</p>
+                
+                <!-- 1. 頂部關鍵數據指標卡片 (KPI Summary) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">總保養工單數</p>
+                            <p class="text-2xl font-bold text-slate-100 font-mono" id="maintTotalCount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">處理中 / 待保養</p>
+                            <p class="text-2xl font-bold text-amber-400 font-mono" id="maintPendingCount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">已完成保養</p>
+                            <p class="text-2xl font-bold text-emerald-400 font-mono" id="maintCompletedCount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">累積維護費用 (NTD)</p>
+                            <p class="text-2xl font-bold text-purple-300 font-mono" id="maintTotalCost">$0</p>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- 2. 新增保養工單表單區塊 -->
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
+                        <h2 class="font-bold text-slate-100 flex items-center gap-2 text-base">
+                            <i class="fa-solid fa-square-plus text-amber-400"></i> 新增維修保養工單
+                        </h2>
+                        <span class="text-xs text-slate-400">全生命週期檔案紀錄</span>
+                    </div>
+
+                    <form onsubmit="submitMaintenance(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1">保養日期</label>
+                                <input type="date" id="maintInputDate" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1">類別</label>
+                                <select id="maintInputType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
+                                    <option value="定期保養">定期保養</option>
+                                    <option value="故障維修">故障維修</option>
+                                    <option value="零件更換">零件更換</option>
+                                    <option value="年度大修">年度大修</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1">保養項目 / 說明</label>
+                                <input type="text" id="maintInputTitle" required placeholder="例如：燃燒機噴嘴清洗、軟水設備換鹽" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1">處理狀態</label>
+                                <select id="maintInputStatus" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
+                                    <option value="已完成">已完成</option>
+                                    <option value="處理中">處理中</option>
+                                    <option value="待派工">待派工</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1">負責廠商 / 技師</label>
+                                <input type="text" id="maintInputTech" placeholder="例如：碩豐工程-陳技師" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1">費用 (NTD)</label>
+                                <input type="number" id="maintInputCost" placeholder="例如：3500" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1">備註說明</label>
+                                <input type="text" id="maintInputNotes" placeholder="無特殊狀況" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button type="submit" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-xs flex items-center gap-2 shadow-lg transition-colors">
+                                <i class="fa-solid fa-plus"></i> 建立保養工單
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 3. 維修保養歷史紀錄對照表 -->
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> 保養與維修履歷對照表
+                        </h3>
+                        <span class="text-xs text-slate-400">數據已與當前設備連結</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-300">
+                            <thead class="bg-slate-950/80 text-slate-300 border-b border-slate-700 uppercase font-semibold text-xs">
+                                <tr>
+                                    <th class="p-3.5">保養日期</th>
+                                    <th class="p-3.5">類別</th>
+                                    <th class="p-3.5">保養項目與說明</th>
+                                    <th class="p-3.5">狀態</th>
+                                    <th class="p-3.5">負責技師/廠商</th>
+                                    <th class="p-3.5">費用 (NTD)</th>
+                                    <th class="p-3.5">備註</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maintenanceHistoryBody" class="divide-y divide-slate-700/60 font-mono text-xs">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
 
             <!-- TAB 4: 巡檢提醒與設定 -->
@@ -364,6 +487,18 @@
             ]
         };
 
+        // 維修保養模擬資料 (已連動設備)
+        let maintenanceRecords = {
+            "B01": [
+                { date: "2026-07-15", type: "定期保養", title: "燃燒機噴嘴清洗與軟水系統鹽錠補充", status: "已完成", tech: "碩豐工程 - 陳技師", cost: 3500, notes: "系統運轉正常，軟水硬度降至 10 ppm" },
+                { date: "2026-06-10", type: "零件更換", title: "給水幫浦高壓密封墊圈更換", status: "已完成", tech: "碩豐工程 - 王技師", cost: 2800, notes: "排除微幅洩漏問題" },
+                { date: "2026-07-25", type: "定期保養", title: "月度鍋爐內部積碳檢查與水位計校正", status: "處理中", tech: "廠區維護組", cost: 0, notes: "已安排下週排空作業" }
+            ],
+            "B02": [
+                { date: "2026-05-20", type: "年度大修", title: "安全閥壓力校驗與整體管路耐壓測試", status: "已完成", tech: "原廠第三方檢驗所", cost: 18000, notes: "取得安檢合格證書" }
+            ]
+        };
+
         let selectedBoilerId = "B01";
         let trendChart = null;
 
@@ -386,6 +521,7 @@
             selectedBoilerId = document.getElementById('leftBoilerSelect').value;
             updateCurrentBoilerUI();
             renderHistoryTableAndChart();
+            renderMaintenanceTable();
         }
 
         function updateCurrentBoilerUI() {
@@ -434,7 +570,88 @@
             checkRealtimeHealth();
         }
 
-        // 動態即時計算健康度與更新 UI (顏色燈號/文字/警告標籤)
+        // 渲染維修保養履歷對照表與統計卡片
+        function renderMaintenanceTable() {
+            const list = maintenanceRecords[selectedBoilerId] || [];
+            const tbody = document.getElementById('maintenanceHistoryBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            let pending = 0;
+            let completed = 0;
+            let totalCost = 0;
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">此設備尚無維修保養紀錄。</td></tr>';
+            } else {
+                list.slice().reverse().forEach(function(item) {
+                    if (item.status === '已完成') completed++;
+                    else pending++;
+                    totalCost += (parseFloat(item.cost) || 0);
+
+                    let statusBadge = '';
+                    if (item.status === '已完成') {
+                        statusBadge = '<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">已完成</span>';
+                    } else if (item.status === '處理中') {
+                        statusBadge = '<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold">處理中</span>';
+                    } else {
+                        statusBadge = '<span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px]">待派工</span>';
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-800/50 transition-colors";
+                    tr.innerHTML = 
+                        '<td class="p-3.5 text-slate-200 font-medium">' + item.date + '</td>' +
+                        '<td class="p-3.5 text-sky-400 font-sans font-medium">' + item.type + '</td>' +
+                        '<td class="p-3.5 text-slate-100 font-sans font-bold">' + item.title + '</td>' +
+                        '<td class="p-3.5 font-sans">' + statusBadge + '</td>' +
+                        '<td class="p-3.5 text-slate-300 font-sans">' + (item.tech || '-') + '</td>' +
+                        '<td class="p-3.5 text-purple-300 font-bold">$ ' + (item.cost ? Number(item.cost).toLocaleString() : '0') + '</td>' +
+                        '<td class="p-3.5 text-slate-400 font-sans">' + (item.notes || '-') + '</td>';
+                    
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // 更新 KPI 指標卡片
+            document.getElementById('maintTotalCount').innerText = list.length;
+            document.getElementById('maintPendingCount').innerText = pending;
+            document.getElementById('maintCompletedCount').innerText = completed;
+            document.getElementById('maintTotalCost').innerText = '$ ' + totalCost.toLocaleString();
+        }
+
+        function submitMaintenance(e) {
+            e.preventDefault();
+            const date = document.getElementById('maintInputDate').value;
+            const type = document.getElementById('maintInputType').value;
+            const title = document.getElementById('maintInputTitle').value.trim();
+            const status = document.getElementById('maintInputStatus').value;
+            const tech = document.getElementById('maintInputTech').value.trim();
+            const cost = parseFloat(document.getElementById('maintInputCost').value) || 0;
+            const notes = document.getElementById('maintInputNotes').value.trim();
+
+            if (!date || !title) return alert("請填寫保養日期與保養項目名稱！");
+
+            if (!maintenanceRecords[selectedBoilerId]) {
+                maintenanceRecords[selectedBoilerId] = [];
+            }
+
+            maintenanceRecords[selectedBoilerId].push({
+                date: date,
+                type: type,
+                title: title,
+                status: status,
+                tech: tech,
+                cost: cost,
+                notes: notes
+            });
+
+            alert("✅ 保養維修工單已成功建立！");
+            renderMaintenanceTable();
+        }
+
+        // 動態即時計算健康度與更新 UI
         function checkRealtimeHealth() {
             const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value) || 0;
             const hardness = parseFloat(document.getElementById('inputHardness').value) || 0;
@@ -529,6 +746,7 @@
             const newId = "B" + String(boilers.length + 1).padStart(2, '0');
             boilers.push({ id: newId, name: newName, type: newType, detail: newDetail || "暫無規格備註" });
             boilerRecords[newId] = [];
+            maintenanceRecords[newId] = [];
             selectedBoilerId = newId;
             renderBoilerOptions();
             alert("✅ 新設備建立完成！已自動切換至該設備。");
@@ -663,6 +881,8 @@
 
             if (tabId === 'trends') {
                 renderHistoryTableAndChart();
+            } else if (tabId === 'maintenance') {
+                renderMaintenanceTable();
             }
         }
 
@@ -695,6 +915,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             renderBoilerOptions();
             renderHistoryTableAndChart();
+            renderMaintenanceTable();
+
+            // 預設日期為今天
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('maintInputDate');
+            if (dateInput) dateInput.value = today;
 
             // 監聽輸入即時變更分數與顏色
             ['inputFlueTemp', 'inputHardness', 'inputDynamicParam'].forEach(function(id) {
