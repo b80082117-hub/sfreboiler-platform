@@ -31,20 +31,29 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     </style>
 </head>
-<body class="h-full flex overflow-hidden font-sans antialiased">
+<body class="h-full flex overflow-hidden font-sans antialiased relative">
 
-    <!-- 側邊導覽列 -->
-    <aside class="w-72 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0">
+    <!-- 手機版側邊欄遮罩 -->
+    <div id="mobileBackdrop" class="hidden fixed inset-0 bg-black/60 z-30 lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- 側邊導覽列 (支援手機版抽屜滑出機制) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
         <div class="overflow-y-auto">
             <!-- Logo 區塊 -->
-            <div class="h-16 flex items-center px-4 border-b border-slate-800 bg-slate-900/50 gap-3">
-                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-sky-500/20">
-                    <i class="fa-solid fa-fire-flame-curved text-lg"></i>
+            <div class="h-16 flex items-center justify-between px-4 border-b border-slate-800 bg-slate-900/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-sky-500/20">
+                        <i class="fa-solid fa-fire-flame-curved text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-sm tracking-wide text-white">碩豐熱能</h1>
+                        <p class="text-[10px] text-slate-400">巡檢與履歷管理平台</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="font-bold text-sm tracking-wide text-white">碩豐熱能</h1>
-                    <p class="text-[10px] text-slate-400">巡檢與履歷管理平台</p>
-                </div>
+                <!-- 手機版關閉側欄按鈕 -->
+                <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
 
             <!-- 左側設備選擇與管理區塊 -->
@@ -150,35 +159,42 @@
     </aside>
 
     <!-- 主要內容區塊 -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-slate-900">
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-900 w-full min-w-0">
         
         <!-- 頂部 Header & 巡檢提醒 Banner -->
-        <header class="border-b border-slate-800 bg-slate-950/40 px-6 py-3 shrink-0 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-slate-400">當前選擇：</span>
-                <span id="headerBoilerTitle" class="text-sm font-bold text-sky-400">#1 貫流式鍋爐 (1.0 Ton/hr)</span>
-                <span id="headerBoilerBadge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium me-2">熱水鍋爐</span>
+        <header class="border-b border-slate-800 bg-slate-950/40 px-4 lg:px-6 py-3 shrink-0 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-3">
+                <!-- 手機版展開選單按鈕 -->
+                <button onclick="toggleSidebar()" class="lg:hidden text-slate-300 hover:text-white p-1.5 rounded bg-slate-800 border border-slate-700">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-xs text-slate-400 hidden sm:inline">當前選擇：</span>
+                    <span id="headerBoilerTitle" class="text-xs sm:text-sm font-bold text-sky-400 truncate max-w-[150px] sm:max-w-none">#1 貫流式鍋爐 (1.0 Ton/hr)</span>
+                    <span id="headerBoilerBadge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium">熱水鍋爐</span>
+                </div>
             </div>
 
-            <div id="reminderBanner" class="flex items-center gap-3 px-4 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-xs">
-                <i class="fa-solid fa-clock-rotate-left text-base animate-pulse"></i>
+            <div id="reminderBanner" class="hidden md:flex items-center gap-3 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-xs">
+                <i class="fa-solid fa-clock-rotate-left text-sm animate-pulse"></i>
                 <div>
                     <span class="font-bold">【巡檢提醒】</span>
-                    <span>距離今天「班次巡檢」填報期限剩餘 <strong>01:45:00</strong></span>
+                    <span>距離今天填報剩餘 <strong>01:45:00</strong></span>
                 </div>
-                <button onclick="switchTab('inspection')" class="ml-2 px-2 py-0.5 bg-amber-500 text-slate-950 font-bold rounded text-[11px] hover:bg-amber-400">立即填報</button>
+                <button onclick="switchTab('inspection')" class="ml-2 px-2 py-0.5 bg-amber-500 text-slate-950 font-bold rounded text-[11px] hover:bg-amber-400">填報</button>
             </div>
         </header>
 
         <!-- 頁籤內容區 -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <div class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
 
             <!-- TAB 1: 巡檢資料填報 -->
             <div id="tab-inspection" class="tab-content space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                     
                     <!-- 輸入表單 -->
-                    <div class="lg:col-span-4 bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-md">
+                    <div class="lg:col-span-4 bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
                         <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-700">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2 text-base">
                                 <i class="fa-solid fa-pen-to-square text-sky-400"></i> 新增日常巡檢紀錄
@@ -289,27 +305,27 @@
                     <h2 class="font-semibold text-slate-200 mb-2 flex items-center gap-2 text-sm">
                         <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期巡檢數據綜合趨勢圖
                     </h2>
-                    <div class="relative w-full h-44">
+                    <div class="relative w-full h-44 sm:h-64">
                         <canvas id="inspectionTrendChart"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 shadow-lg">
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4 sm:p-6 shadow-lg">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                        <h3 class="font-bold text-slate-100 text-sm sm:text-base flex items-center gap-2">
                             <i class="fa-solid fa-table-list text-sky-400"></i> 歷史巡檢數據詳細對照表
                         </h3>
-                        <span class="text-xs text-slate-400">（數據實時同步）</span>
+                        <span class="text-xs text-slate-400 hidden sm:inline">（數據實時同步）</span>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-300">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-300 min-w-[500px]">
                             <thead class="bg-slate-950/80 text-slate-300 border-b border-slate-700 uppercase font-semibold">
                                 <tr>
-                                    <th class="p-3.5">巡檢日期</th>
-                                    <th class="p-3.5">排煙溫度 (°C)</th>
-                                    <th class="p-3.5" id="thDynamicParam">熱水溫度 (°C)</th>
-                                    <th class="p-3.5">給水溫度 (°C)</th>
-                                    <th class="p-3.5">巡檢人員</th>
+                                    <th class="p-3">巡檢日期</th>
+                                    <th class="p-3">排煙溫度 (°C)</th>
+                                    <th class="p-3" id="thDynamicParam">熱水溫度 (°C)</th>
+                                    <th class="p-3">給水溫度 (°C)</th>
+                                    <th class="p-3">巡檢人員</th>
                                 </tr>
                             </thead>
                             <tbody id="inspectionHistoryBody" class="divide-y divide-slate-700/60 font-mono">
@@ -319,63 +335,63 @@
                 </div>
             </div>
 
-            <!-- TAB 3: 維修保養履歷 (含照片上傳與對照功能) -->
+            <!-- TAB 3: 維修保養履歷 -->
             <div id="tab-maintenance" class="tab-content hidden space-y-6">
                 
                 <!-- 1. 頂部關鍵數據指標卡片 (KPI Summary) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-xl">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 lg:p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg lg:text-xl shrink-0">
                             <i class="fa-solid fa-file-invoice"></i>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-400">總保養工單數</p>
-                            <p class="text-2xl font-bold text-slate-100 font-mono" id="maintTotalCount">0</p>
+                            <p class="text-[11px] lg:text-xs text-slate-400">總保養工單</p>
+                            <p class="text-xl lg:text-2xl font-bold text-slate-100 font-mono" id="maintTotalCount">0</p>
                         </div>
                     </div>
 
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 lg:p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg lg:text-xl shrink-0">
                             <i class="fa-solid fa-screwdriver-wrench"></i>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-400">處理中 / 待保養</p>
-                            <p class="text-2xl font-bold text-amber-400 font-mono" id="maintPendingCount">0</p>
+                            <p class="text-[11px] lg:text-xs text-slate-400">處理中/待保養</p>
+                            <p class="text-xl lg:text-2xl font-bold text-amber-400 font-mono" id="maintPendingCount">0</p>
                         </div>
                     </div>
 
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 lg:p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg lg:text-xl shrink-0">
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-400">已完成保養</p>
-                            <p class="text-2xl font-bold text-emerald-400 font-mono" id="maintCompletedCount">0</p>
+                            <p class="text-[11px] lg:text-xs text-slate-400">已完成保養</p>
+                            <p class="text-xl lg:text-2xl font-bold text-emerald-400 font-mono" id="maintCompletedCount">0</p>
                         </div>
                     </div>
 
-                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl">
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 lg:p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg lg:text-xl shrink-0">
                             <i class="fa-solid fa-coins"></i>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-400">累積維護費用 (NTD)</p>
-                            <p class="text-2xl font-bold text-purple-300 font-mono" id="maintTotalCost">$0</p>
+                            <p class="text-[11px] lg:text-xs text-slate-400">累積維護費用</p>
+                            <p class="text-lg lg:text-2xl font-bold text-purple-300 font-mono truncate" id="maintTotalCost">$0</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. 新增保養工單表單區塊 (含兩張照片上傳) -->
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
+                <!-- 2. 新增保養工單表單區塊 (含照片上傳) -->
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-lg">
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
-                        <h2 class="font-bold text-slate-100 flex items-center gap-2 text-base">
+                        <h2 class="font-bold text-slate-100 flex items-center gap-2 text-sm sm:text-base">
                             <i class="fa-solid fa-square-plus text-amber-400"></i> 新增維修保養工單
                         </h2>
-                        <span class="text-xs text-slate-400">支援維修前後照片上傳與備份</span>
+                        <span class="text-[10px] sm:text-xs text-slate-400">支援照片對照備份</span>
                     </div>
 
                     <form onsubmit="submitMaintenance(event)" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                             <div>
                                 <label class="block text-slate-300 font-medium mb-1">保養日期</label>
                                 <input type="date" id="maintInputDate" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
@@ -391,7 +407,7 @@
                             </div>
                             <div>
                                 <label class="block text-slate-300 font-medium mb-1">保養項目 / 說明</label>
-                                <input type="text" id="maintInputTitle" required placeholder="例如：燃燒機噴嘴清洗、軟水設備換鹽" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
+                                <input type="text" id="maintInputTitle" required placeholder="例如：燃燒機噴嘴清洗" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-slate-300 font-medium mb-1">處理狀態</label>
@@ -403,7 +419,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                             <div>
                                 <label class="block text-slate-300 font-medium mb-1">負責廠商 / 技師</label>
                                 <input type="text" id="maintInputTech" placeholder="例如：碩豐工程-陳技師" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-amber-500 focus:outline-none">
@@ -418,16 +434,16 @@
                             </div>
                         </div>
 
-                        <!-- 📸 新增：維修前與維修後照片上傳區塊 -->
+                        <!-- 📸 維修前與維修後照片上傳區塊 -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2 border-t border-slate-700/50">
                             <!-- 維修前照片 -->
                             <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
                                 <label class="block text-amber-400 font-bold flex items-center gap-1.5">
                                     <i class="fa-solid fa-camera"></i> 維修前照片 (Before)
                                 </label>
-                                <input type="file" id="maintPhotoBeforeInput" accept="image/*" onchange="previewImage(this, 'previewBeforeImg')" class="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-300 hover:file:bg-slate-700 cursor-pointer">
+                                <input type="file" id="maintPhotoBeforeInput" accept="image/*" onchange="previewImage(this, 'previewBeforeImg')" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-300 hover:file:bg-slate-700 cursor-pointer">
                                 <div class="w-full h-24 bg-slate-950 rounded flex items-center justify-center overflow-hidden border border-slate-800 relative">
-                                    <img id="previewBeforeImg" class="hidden object-cover w-full h-full" alt="維修前預覽">
+                                    <img id="previewBeforeImg" class="hidden object-contain w-full h-full" alt="維修前預覽">
                                     <span id="previewBeforePlaceholder" class="text-slate-500 text-[11px] flex items-center gap-1">
                                         <i class="fa-regular fa-image"></i> 尚未上傳照片
                                     </span>
@@ -439,9 +455,9 @@
                                 <label class="block text-emerald-400 font-bold flex items-center gap-1.5">
                                     <i class="fa-solid fa-camera-retro"></i> 維修後照片 (After)
                                 </label>
-                                <input type="file" id="maintPhotoAfterInput" accept="image/*" onchange="previewImage(this, 'previewAfterImg')" class="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-emerald-300 hover:file:bg-slate-700 cursor-pointer">
+                                <input type="file" id="maintPhotoAfterInput" accept="image/*" onchange="previewImage(this, 'previewAfterImg')" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-emerald-300 hover:file:bg-slate-700 cursor-pointer">
                                 <div class="w-full h-24 bg-slate-950 rounded flex items-center justify-center overflow-hidden border border-slate-800 relative">
-                                    <img id="previewAfterImg" class="hidden object-cover w-full h-full" alt="維修後預覽">
+                                    <img id="previewAfterImg" class="hidden object-contain w-full h-full" alt="維修後預覽">
                                     <span id="previewAfterPlaceholder" class="text-slate-500 text-[11px] flex items-center gap-1">
                                         <i class="fa-regular fa-image"></i> 尚未上傳照片
                                     </span>
@@ -450,34 +466,34 @@
                         </div>
 
                         <div class="flex justify-end pt-2">
-                            <button type="submit" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-xs flex items-center gap-2 shadow-lg transition-colors">
+                            <button type="submit" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-xs flex items-center justify-center gap-2 shadow-lg transition-colors">
                                 <i class="fa-solid fa-plus"></i> 建立保養工單
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- 3. 維修保養歷史紀錄對照表 (含圖片對照) -->
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
+                <!-- 3. 維修保養歷史紀錄對照表 (含圖片縮圖對照) -->
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-lg">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                        <h3 class="font-bold text-slate-100 text-sm sm:text-base flex items-center gap-2">
                             <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> 保養與維修履歷對照表
                         </h3>
-                        <span class="text-xs text-slate-400">點擊圖片即可開放大圖觀看</span>
+                        <span class="text-xs text-slate-400 hidden sm:inline">點擊圖片即可開放大圖觀看</span>
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-300">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-300 min-w-[700px]">
                             <thead class="bg-slate-950/80 text-slate-300 border-b border-slate-700 uppercase font-semibold text-xs">
                                 <tr>
-                                    <th class="p-3.5">保養日期</th>
-                                    <th class="p-3.5">類別</th>
-                                    <th class="p-3.5">保養項目與說明</th>
-                                    <th class="p-3.5">維修前/後對照照片</th>
-                                    <th class="p-3.5">狀態</th>
-                                    <th class="p-3.5">負責技師/廠商</th>
-                                    <th class="p-3.5">費用 (NTD)</th>
-                                    <th class="p-3.5">備註</th>
+                                    <th class="p-3">保養日期</th>
+                                    <th class="p-3">類別</th>
+                                    <th class="p-3">保養項目與說明</th>
+                                    <th class="p-3">維修前後照片</th>
+                                    <th class="p-3">狀態</th>
+                                    <th class="p-3">負責技師/廠商</th>
+                                    <th class="p-3">費用 (NTD)</th>
+                                    <th class="p-3">備註</th>
                                 </tr>
                             </thead>
                             <tbody id="maintenanceHistoryBody" class="divide-y divide-slate-700/60 font-mono text-xs">
@@ -498,19 +514,35 @@
         </div>
     </main>
 
-    <!-- 照片放大檢視 Modal 面板 -->
-    <div id="imageModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImageModal()">
-        <div class="relative bg-slate-900 border border-slate-700 rounded-xl p-4 max-w-3xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
-            <button onclick="closeImageModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center">✕</button>
-            <h4 id="modalImageTitle" class="text-sm font-bold text-amber-400 mb-3">維修照片對照大圖</h4>
-            <div class="flex gap-4 overflow-auto justify-center max-h-[70vh]">
-                <div class="text-center">
-                    <span class="block text-xs font-bold text-amber-400 mb-1">維修前 (Before)</span>
-                    <img id="modalImgBefore" class="max-h-[60vh] rounded border border-slate-700 object-contain" src="" alt="維修前">
+    <!-- 照片放大檢視 Modal 面板 (已加入強化的直/橫圖防變形對照容器) -->
+    <div id="imageModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" onclick="closeImageModal()">
+        <div class="relative bg-slate-900 border border-slate-700 rounded-xl p-4 sm:p-5 max-w-4xl w-full max-h-[90vh] flex flex-col items-center shadow-2xl" onclick="event.stopPropagation()">
+            <!-- 關閉按鈕 -->
+            <button onclick="closeImageModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-base font-bold bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors">✕</button>
+            
+            <!-- 標題 -->
+            <h4 id="modalImageTitle" class="text-xs sm:text-sm font-bold text-amber-400 mb-4 text-center pr-6">維修照片對照大圖</h4>
+            
+            <!-- 照片對照區域 (使用 Grid 控制直橫照片不變形) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full overflow-y-auto max-h-[75vh]">
+                <!-- 維修前 (Before) -->
+                <div id="containerBefore" class="flex flex-col items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                    <span class="text-xs font-bold text-amber-400 mb-2 flex items-center gap-1">
+                        <i class="fa-solid fa-camera"></i> 維修前 (Before)
+                    </span>
+                    <div class="w-full h-56 sm:h-72 md:h-80 bg-slate-900 rounded overflow-hidden flex items-center justify-center border border-slate-800">
+                        <img id="modalImgBefore" class="w-full h-full object-contain" src="" alt="維修前">
+                    </div>
                 </div>
-                <div class="text-center">
-                    <span class="block text-xs font-bold text-emerald-400 mb-1">維修後 (After)</span>
-                    <img id="modalImgAfter" class="max-h-[60vh] rounded border border-slate-700 object-contain" src="" alt="維修後">
+
+                <!-- 維修後 (After) -->
+                <div id="containerAfter" class="flex flex-col items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                    <span class="text-xs font-bold text-emerald-400 mb-2 flex items-center gap-1">
+                        <i class="fa-solid fa-camera-retro"></i> 維修後 (After)
+                    </span>
+                    <div class="w-full h-56 sm:h-72 md:h-80 bg-slate-900 rounded overflow-hidden flex items-center justify-center border border-slate-800">
+                        <img id="modalImgAfter" class="w-full h-full object-contain" src="" alt="維修後">
+                    </div>
                 </div>
             </div>
         </div>
@@ -537,16 +569,17 @@
             ]
         };
 
-        // 模擬維修前與維修後的預設圖檔 Base64 / URL
-        const sampleBeforeImg = "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300&auto=format&fit=crop&q=60";
-        const sampleAfterImg = "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=300&auto=format&fit=crop&q=60";
+        // 預設樣例圖片 URL
+        const sampleBeforeImg = "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80";
+        const sampleAfterImg = "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=500&auto=format&fit=crop&q=80";
 
-        // 維修保養模擬資料 (包含維修前後照片)
+        // 維修保養紀錄
         let maintenanceRecords = {
             "B01": [
-                { date: "2026-07-15", type: "定期保養", title: "燃燒機噴嘴清洗與軟水系統鹽錠補充", status: "已完成", tech: "碩豐工程 - 陳技師", cost: 3500, notes: "系統運轉正常，軟水硬度降至 10 ppm", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg },
+                { date: "2026-07-21", type: "定期保養", title: "冷媒qqqq", status: "已完成", tech: "-", cost: 4000, notes: "-", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg },
+                { date: "2026-07-25", type: "定期保養", title: "月度鍋爐內部積碳檢查與水位計校正", status: "處理中", tech: "廠區維護組", cost: 0, notes: "已安排下週排空作業", photoBefore: null, photoAfter: null },
                 { date: "2026-06-10", type: "零件更換", title: "給水幫浦高壓密封墊圈更換", status: "已完成", tech: "碩豐工程 - 王技師", cost: 2800, notes: "排除微幅洩漏問題", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg },
-                { date: "2026-07-25", type: "定期保養", title: "月度鍋爐內部積碳檢查與水位計校正", status: "處理中", tech: "廠區維護組", cost: 0, notes: "已安排下週排空作業", photoBefore: null, photoAfter: null }
+                { date: "2026-07-15", type: "定期保養", title: "燃燒機噴嘴清洗與軟水系統鹽錠補充", status: "已完成", tech: "碩豐工程 - 陳技師", cost: 3500, notes: "系統運轉正常，軟水硬度降至 10 ppm", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg }
             ],
             "B02": [
                 { date: "2026-05-20", type: "年度大修", title: "安全閥壓力校驗與整體管路耐壓測試", status: "已完成", tech: "原廠第三方檢驗所", cost: 18000, notes: "取得安檢合格證書", photoBefore: sampleBeforeImg, photoAfter: sampleAfterImg }
@@ -555,9 +588,21 @@
 
         let tempPhotoBefore = null;
         let tempPhotoAfter = null;
-
         let selectedBoilerId = "B01";
         let trendChart = null;
+
+        // 手機版側欄切換控制
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('mobileBackdrop');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
 
         function renderBoilerOptions() {
             const select = document.getElementById('leftBoilerSelect');
@@ -627,7 +672,7 @@
             checkRealtimeHealth();
         }
 
-        // 上傳照片即時轉碼與預覽
+        // 上傳照片即時預覽
         function previewImage(input, imgElementId) {
             const file = input.files[0];
             const imgEl = document.getElementById(imgElementId);
@@ -650,7 +695,7 @@
             }
         }
 
-        // 渲染維修保養履歷對照表 (含圖片欄位)
+        // 渲染維修履歷對照表
         function renderMaintenanceTable() {
             const list = maintenanceRecords[selectedBoilerId] || [];
             const tbody = document.getElementById('maintenanceHistoryBody');
@@ -665,7 +710,7 @@
             if (list.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">此設備尚無維修保養紀錄。</td></tr>';
             } else {
-                list.slice().reverse().forEach(function(item) {
+                list.slice().forEach(function(item) {
                     if (item.status === '已完成') completed++;
                     else pending++;
                     totalCost += (parseFloat(item.cost) || 0);
@@ -679,15 +724,15 @@
                         statusBadge = '<span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px]">待派工</span>';
                     }
 
-                    // 照片顯示區塊 HTML
+                    // 圖片縮圖區塊 HTML
                     let photoHTML = '<span class="text-slate-500 text-[10px]">無照片</span>';
                     if (item.photoBefore || item.photoAfter) {
                         const beforeSrc = item.photoBefore || item.photoAfter;
                         const afterSrc = item.photoAfter || item.photoBefore;
                         photoHTML = `
                             <div class="flex items-center gap-1.5 cursor-pointer group" onclick="openImageModal('${beforeSrc}', '${afterSrc}', '${item.title}')">
-                                ${item.photoBefore ? `<img src="${item.photoBefore}" class="w-8 h-8 rounded border border-amber-500/50 object-cover group-hover:scale-105 transition-transform" title="點擊看大圖(維修前)">` : ''}
-                                ${item.photoAfter ? `<img src="${item.photoAfter}" class="w-8 h-8 rounded border border-emerald-500/50 object-cover group-hover:scale-105 transition-transform" title="點擊看大圖(維修後)">` : ''}
+                                ${item.photoBefore ? `<img src="${item.photoBefore}" class="w-9 h-9 rounded border border-amber-500/50 object-cover group-hover:scale-105 transition-transform" title="點擊放大(維修前)">` : ''}
+                                ${item.photoAfter ? `<img src="${item.photoAfter}" class="w-9 h-9 rounded border border-emerald-500/50 object-cover group-hover:scale-105 transition-transform" title="點擊放大(維修後)">` : ''}
                             </div>
                         `;
                     }
@@ -695,37 +740,46 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-800/50 transition-colors";
                     tr.innerHTML = 
-                        '<td class="p-3.5 text-slate-200 font-medium">' + item.date + '</td>' +
-                        '<td class="p-3.5 text-sky-400 font-sans font-medium">' + item.type + '</td>' +
-                        '<td class="p-3.5 text-slate-100 font-sans font-bold">' + item.title + '</td>' +
-                        '<td class="p-3.5 font-sans">' + photoHTML + '</td>' +
-                        '<td class="p-3.5 font-sans">' + statusBadge + '</td>' +
-                        '<td class="p-3.5 text-slate-300 font-sans">' + (item.tech || '-') + '</td>' +
-                        '<td class="p-3.5 text-purple-300 font-bold">$ ' + (item.cost ? Number(item.cost).toLocaleString() : '0') + '</td>' +
-                        '<td class="p-3.5 text-slate-400 font-sans">' + (item.notes || '-') + '</td>';
+                        '<td class="p-3 text-slate-200 font-medium whitespace-nowrap">' + item.date + '</td>' +
+                        '<td class="p-3 text-sky-400 font-sans font-medium whitespace-nowrap">' + item.type + '</td>' +
+                        '<td class="p-3 text-slate-100 font-sans font-bold">' + item.title + '</td>' +
+                        '<td class="p-3 font-sans">' + photoHTML + '</td>' +
+                        '<td class="p-3 font-sans whitespace-nowrap">' + statusBadge + '</td>' +
+                        '<td class="p-3 text-slate-300 font-sans whitespace-nowrap">' + (item.tech || '-') + '</td>' +
+                        '<td class="p-3 text-purple-300 font-bold whitespace-nowrap">$ ' + (item.cost ? Number(item.cost).toLocaleString() : '0') + '</td>' +
+                        '<td class="p-3 text-slate-400 font-sans">' + (item.notes || '-') + '</td>';
                     
                     tbody.appendChild(tr);
                 });
             }
 
-            // 更新 KPI 指標卡片
             document.getElementById('maintTotalCount').innerText = list.length;
             document.getElementById('maintPendingCount').innerText = pending;
             document.getElementById('maintCompletedCount').innerText = completed;
             document.getElementById('maintTotalCost').innerText = '$ ' + totalCost.toLocaleString();
         }
 
-        // 打開與關閉圖片 Modal 放大預覽
+        // 打開對照照片 Modal 視窗
         function openImageModal(beforeSrc, afterSrc, title) {
             document.getElementById('modalImageTitle').innerText = title + " - 照片對照";
             const beforeImg = document.getElementById('modalImgBefore');
             const afterImg = document.getElementById('modalImgAfter');
+            const containerBefore = document.getElementById('containerBefore');
+            const containerAfter = document.getElementById('containerAfter');
 
-            if (beforeSrc) { beforeImg.src = beforeSrc; beforeImg.parentElement.classList.remove('hidden'); }
-            else { beforeImg.parentElement.classList.add('hidden'); }
+            if (beforeSrc && beforeSrc !== 'null') {
+                beforeImg.src = beforeSrc;
+                containerBefore.classList.remove('hidden');
+            } else {
+                containerBefore.classList.add('hidden');
+            }
 
-            if (afterSrc) { afterImg.src = afterSrc; afterImg.parentElement.classList.remove('hidden'); }
-            else { afterImg.parentElement.classList.add('hidden'); }
+            if (afterSrc && afterSrc !== 'null') {
+                afterImg.src = afterSrc;
+                containerAfter.classList.remove('hidden');
+            } else {
+                containerAfter.classList.add('hidden');
+            }
 
             document.getElementById('imageModal').classList.remove('hidden');
         }
@@ -750,7 +804,7 @@
                 maintenanceRecords[selectedBoilerId] = [];
             }
 
-            maintenanceRecords[selectedBoilerId].push({
+            maintenanceRecords[selectedBoilerId].unshift({
                 date: date,
                 type: type,
                 title: title,
@@ -762,7 +816,7 @@
                 photoAfter: tempPhotoAfter
             });
 
-            // 清空圖片暫存與預覽
+            // 清空圖片上傳暫存
             tempPhotoBefore = null;
             tempPhotoAfter = null;
             document.getElementById('previewBeforeImg').classList.add('hidden');
@@ -772,11 +826,11 @@
             document.getElementById('maintPhotoBeforeInput').value = '';
             document.getElementById('maintPhotoAfterInput').value = '';
 
-            alert("✅ 保養維修工單已成功建立（包含照片）！");
+            alert("✅ 保養維修工單已成功建立！");
             renderMaintenanceTable();
         }
 
-        // 動態即時計算健康度與更新 UI
+        // 動態診斷
         function checkRealtimeHealth() {
             const flueTemp = parseFloat(document.getElementById('inputFlueTemp').value) || 0;
             const hardness = parseFloat(document.getElementById('inputHardness').value) || 0;
@@ -906,11 +960,11 @@
                     const tr = document.createElement('tr');
                     const unitStr = isHotWater ? '°C' : 'MPa';
                     tr.className = "hover:bg-slate-800/50 transition-colors";
-                    tr.innerHTML = '<td class="p-3.5 font-medium text-slate-200">' + r.date + '</td>' +
-                        '<td class="p-3.5 text-amber-400 font-bold">' + r.flueTemp + ' °C</td>' +
-                        '<td class="p-3.5 text-sky-400 font-semibold">' + r.dynamicVal + ' ' + unitStr + '</td>' +
-                        '<td class="p-3.5 text-emerald-400 font-semibold">' + r.waterTemp + ' °C</td>' +
-                        '<td class="p-3.5 text-slate-300 font-sans">' + r.inspector + '</td>';
+                    tr.innerHTML = '<td class="p-3 font-medium text-slate-200">' + r.date + '</td>' +
+                        '<td class="p-3 text-amber-400 font-bold">' + r.flueTemp + ' °C</td>' +
+                        '<td class="p-3 text-sky-400 font-semibold">' + r.dynamicVal + ' ' + unitStr + '</td>' +
+                        '<td class="p-3 text-emerald-400 font-semibold">' + r.waterTemp + ' °C</td>' +
+                        '<td class="p-3 text-slate-300 font-sans">' + r.inspector + '</td>';
                     tbody.appendChild(tr);
                 });
             }
@@ -1002,6 +1056,14 @@
             if (activeNav) {
                 activeNav.classList.add('bg-brand-600', 'text-white');
                 activeNav.classList.remove('text-slate-400');
+            }
+
+            // 在手機點擊選單後自動收合側欄
+            if (window.innerWidth < 1024) {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
             }
 
             if (tabId === 'trends') {
