@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- QRCode.js CDN (用於自動生成 QR 碼) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -79,10 +81,10 @@
                     </p>
                 </div>
 
-                <!-- 設備新增/修改彈窗 -->
-                <div id="boilerManagerBox" class="hidden p-3 mt-2 bg-slate-900 rounded-lg border border-sky-500/30 text-xs space-y-2">
-                    <div class="font-bold text-slate-200 flex justify-between items-center border-b border-slate-800 pb-1">
-                        <span>設備項目管理</span>
+                <!-- 設備新增/修改與 QR Code 產生視窗 -->
+                <div id="boilerManagerBox" class="hidden p-3 mt-2 bg-slate-900 rounded-lg border border-sky-500/30 text-xs space-y-3">
+                    <div class="font-bold text-slate-200 flex justify-between items-center border-b border-slate-800 pb-1.5">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square text-sky-400"></i> 設備項目管理</span>
                         <button onclick="toggleBoilerManager()" class="text-slate-400 hover:text-white">✕</button>
                     </div>
                     <div>
@@ -100,9 +102,33 @@
                         <label class="block text-[10px] text-slate-400 mb-0.5">設備規格 / 備註資訊：</label>
                         <textarea id="editBoilerDetail" rows="2" placeholder="例: 型號: SF-1000, 常用壓力:1.0 MPa" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none"></textarea>
                     </div>
+
+                    <!-- 操作按鈕區 -->
                     <div class="flex gap-2 pt-1">
-                        <button onclick="saveCurrentBoilerName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-1 rounded text-[11px] font-medium">修改此設備</button>
-                        <button onclick="addNewBoiler()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1 rounded text-[11px] font-medium">新增為新設備</button>
+                        <button onclick="saveCurrentBoilerName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-1.5 rounded text-[11px] font-medium transition-colors">儲存修改</button>
+                        <button onclick="addNewBoiler()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded text-[11px] font-medium transition-colors">新增為新設備</button>
+                    </div>
+
+                    <!-- 🖨️ 生成專屬 QR Code 按鈕 -->
+                    <button onclick="generateQRCodeForCurrentBoiler()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 rounded text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-indigo-600/20">
+                        <i class="fa-solid fa-qrcode"></i> 生成專屬 QR Code
+                    </button>
+
+                    <!-- QR Code 顯示與下載區域 -->
+                    <div id="qrCodeContainer" class="hidden pt-3 border-t border-slate-800 text-center space-y-2">
+                        <p class="text-[10px] font-bold text-indigo-300 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-mobile-screen-button"></i> <span id="qrCodeTitleDisplay">設備專屬 QR Code</span>
+                        </p>
+                        <div class="p-2 bg-white rounded-lg inline-block shadow-lg">
+                            <div id="qrcode" class="flex justify-center items-center"></div>
+                        </div>
+                        <p id="qrCodeUrlText" class="text-[9px] text-slate-500 font-mono truncate px-2"></p>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="downloadQRCode()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-1 rounded text-[10px] flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-download"></i> 下載圖片
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -335,7 +361,7 @@
 
             <!-- TAB 3: 維修保養履歷 -->
             <div id="tab-maintenance" class="tab-content hidden space-y-6">
-                <!-- 1. KPI 數據卡片 -->
+                <!-- KPI 數據卡片 -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                     <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 lg:p-4 flex items-center gap-3">
                         <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg lg:text-xl shrink-0">
@@ -378,7 +404,7 @@
                     </div>
                 </div>
 
-                <!-- 2. 新增保養工單表單 -->
+                <!-- 新增保養工單表單 -->
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-lg">
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
                         <h2 class="font-bold text-slate-100 flex items-center gap-2 text-sm sm:text-base">
@@ -468,7 +494,7 @@
                     </form>
                 </div>
 
-                <!-- 3. 保養歷史對照表 -->
+                <!-- 保養歷史對照表 -->
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-lg">
                     <h3 class="font-bold text-slate-100 text-sm sm:text-base mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> 維修保養歷史紀錄
@@ -609,20 +635,20 @@
         };
 
         let trendChart = null;
+        let qrCodeObj = null;
 
         // 初始化頁面
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentDateStr').innerText = new Date().toISOString().split('T')[0];
             document.getElementById('maintInputDate').value = new Date().toISOString().split('T')[0];
             
-            // 🔍 自動解析網址 QR Code 參數 (例如: ?boiler=b1)
+            // 🔍 解析網址 QR Code 參數 (例如: ?boiler=b1)
             const urlParams = new URLSearchParams(window.location.search);
             const boilerParam = urlParams.get('boiler');
 
             if (boilerParam && boilers.some(b => b.id === boilerParam)) {
                 currentBoilerId = boilerParam;
                 localStorage.setItem('sf_current_boiler', currentBoilerId);
-                // 顯示 QR Code 成功載入提示徽章
                 const notice = document.getElementById('qrScanNotice');
                 if (notice) notice.classList.remove('hidden');
             }
@@ -634,7 +660,7 @@
             initReminderUI();
         });
 
-        // 切換側邊欄 (手機版)
+        // 切換側邊欄
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('mobileBackdrop');
@@ -661,6 +687,8 @@
         // 設備管理視窗 toggle
         function toggleBoilerManager() {
             document.getElementById('boilerManagerBox').classList.toggle('hidden');
+            // 關閉管理視窗時隱藏 QR 碼
+            document.getElementById('qrCodeContainer').classList.add('hidden');
         }
 
         // 巡檢員編輯 toggle
@@ -696,30 +724,76 @@
             const b = boilers.find(x => x.id === currentBoilerId);
             if (!b) return;
 
-            // 標題與規格
             document.getElementById('headerBoilerTitle').innerText = b.name;
             document.getElementById('headerBoilerBadge').innerText = b.type === 'steam' ? '蒸氣鍋爐' : '熱水鍋爐';
             document.getElementById('leftBoilerDetailDisplay').innerText = b.detail || '暫無規格資訊';
 
-            // 修改欄位預設文字
             document.getElementById('editBoilerName').value = b.name;
             document.getElementById('editBoilerType').value = b.type;
             document.getElementById('editBoilerDetail').value = b.detail || '';
 
-            // 動態標籤改變
             const isSteam = b.type === 'steam';
             const labelText = isSteam ? '蒸氣壓力 (MPa)' : '熱水出水溫度 (°C)';
             document.getElementById('lblDynamicParam').innerText = labelText;
             document.getElementById('thDynamicParam').innerText = labelText;
             document.getElementById('inputDynamicParam').placeholder = isSteam ? '前次: 0.75 MPa' : '前次: 85 °C';
 
-            // 更新數據表與圖表
             renderInspectionHistory();
             updateChart();
             renderMaintenanceTable();
         }
 
-        // 新增 / 修改設備
+        // 🖨️ 生成專屬 QR Code 核心邏輯
+        function generateQRCodeForCurrentBoiler() {
+            const name = document.getElementById('editBoilerName').value || '未命名設備';
+            const baseUrl = window.location.href.split('?')[0];
+            const qrTargetUrl = `${baseUrl}?boiler=${currentBoilerId}`;
+
+            document.getElementById('qrCodeTitleDisplay').innerText = `${name} 專屬 QR Code`;
+            document.getElementById('qrCodeUrlText').innerText = qrTargetUrl;
+
+            // 清空舊的 QR 碼元素
+            const container = document.getElementById('qrcode');
+            container.innerHTML = '';
+
+            // 使用 QRCode.js 畫圖
+            qrCodeObj = new QRCode(container, {
+                text: qrTargetUrl,
+                width: 140,
+                height: 140,
+                colorDark : "#0f172a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('qrCodeContainer').classList.remove('hidden');
+        }
+
+        // 下載 QR Code 圖片
+        function downloadQRCode() {
+            const img = document.querySelector('#qrcode img');
+            const canvas = document.querySelector('#qrcode canvas');
+            let imageSrc = '';
+
+            if (img && img.src) {
+                imageSrc = img.src;
+            } else if (canvas) {
+                imageSrc = canvas.toDataURL("image/png");
+            }
+
+            if (imageSrc) {
+                const a = document.createElement('a');
+                a.href = imageSrc;
+                a.download = `QRCode_${currentBoilerId}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                alert('QR Code 產生中，請稍後再試！');
+            }
+        }
+
+        // 儲存目前修改的設備
         function saveCurrentBoilerName() {
             const b = boilers.find(x => x.id === currentBoilerId);
             if (b) {
@@ -729,10 +803,11 @@
                 localStorage.setItem('sf_boilers', JSON.stringify(boilers));
                 renderBoilerSelect();
                 updateUIByCurrentBoiler();
-                toggleBoilerManager();
+                alert('設備資訊已成功儲存！');
             }
         }
 
+        // 新增新設備
         function addNewBoiler() {
             const newId = 'b_' + Date.now();
             const newB = {
@@ -750,7 +825,8 @@
             
             renderBoilerSelect();
             updateUIByCurrentBoiler();
-            toggleBoilerManager();
+            generateQRCodeForCurrentBoiler();
+            alert('成功新增設備！已同步產生新設備的 QR Code。');
         }
 
         // 提交日常巡檢
