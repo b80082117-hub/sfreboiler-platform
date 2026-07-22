@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- QRCode.js CDN (用於自動生成 QR 碼) -->
+    <!-- QRCode.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         tailwind.config = {
@@ -88,8 +88,8 @@
                         <button onclick="toggleBoilerManager()" class="text-slate-400 hover:text-white">✕</button>
                     </div>
                     <div>
-                        <label class="block text-[10px] text-slate-400 mb-0.5">設備名稱：</label>
-                        <input type="text" id="editBoilerName" placeholder="輸入設備名稱..." class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs">
+                        <label class="block text-[10px] text-slate-400 mb-0.5">設備名稱 (必須唯一)：</label>
+                        <input type="text" id="editBoilerName" placeholder="輸入設備唯一名稱..." class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs">
                     </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-0.5">鍋爐類型：</label>
@@ -109,6 +109,10 @@
                         <button onclick="addNewBoiler()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded text-[11px] font-medium transition-colors">新增為新設備</button>
                     </div>
 
+                    <button onclick="deleteCurrentBoiler()" class="w-full bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/50 py-1 rounded text-[10px] flex items-center justify-center gap-1 transition-colors">
+                        <i class="fa-solid fa-trash-can"></i> 刪除此設備
+                    </button>
+
                     <!-- 🖨️ 生成專屬 QR Code 按鈕 -->
                     <button onclick="generateQRCodeForCurrentBoiler()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 rounded text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-indigo-600/20">
                         <i class="fa-solid fa-qrcode"></i> 生成專屬 QR Code
@@ -122,7 +126,7 @@
                         <div class="p-2 bg-white rounded-lg inline-block shadow-lg">
                             <div id="qrcode" class="flex justify-center items-center"></div>
                         </div>
-                        <p id="qrCodeUrlText" class="text-[9px] text-slate-500 font-mono truncate px-2"></p>
+                        <p id="qrCodeUrlText" class="text-[9px] text-slate-500 font-mono truncate px-2 break-all"></p>
                         
                         <div class="flex gap-2">
                             <button onclick="downloadQRCode()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-1 rounded text-[10px] flex items-center justify-center gap-1">
@@ -193,10 +197,10 @@
 
                 <div class="flex flex-wrap items-center gap-1.5">
                     <span class="text-xs text-slate-400 hidden sm:inline">當前選擇：</span>
-                    <span id="headerBoilerTitle" class="text-xs sm:text-sm font-bold text-sky-400 truncate max-w-[150px] sm:max-w-none">#1 貫流式鍋爐 (1.0 Ton/hr)</span>
+                    <span id="headerBoilerTitle" class="text-xs sm:text-sm font-bold text-sky-400 truncate max-w-[150px] sm:max-w-none">載入中...</span>
                     <span id="headerBoilerBadge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium">熱水鍋爐</span>
                     <span id="qrScanNotice" class="hidden text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                        <i class="fa-solid fa-qrcode"></i> QR碼自動帶入
+                        <i class="fa-solid fa-qrcode"></i> QR碼自動切換
                     </span>
                 </div>
             </div>
@@ -205,7 +209,7 @@
                 <i class="fa-solid fa-clock-rotate-left text-sm animate-pulse"></i>
                 <div>
                     <span class="font-bold">【巡檢提醒】</span>
-                    <span>距離今天填報剩餘 <strong>01:45:00</strong></span>
+                    <span>每日定時填報提醒已開啟</span>
                 </div>
                 <button onclick="switchTab('inspection')" class="ml-2 px-2 py-0.5 bg-amber-500 text-slate-950 font-bold rounded text-[11px] hover:bg-amber-400">填報</button>
             </div>
@@ -230,19 +234,19 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
                                 <div>
                                     <label id="lblDynamicParam" class="block text-slate-300 font-medium mb-1.5">熱水出水溫度 (°C)</label>
-                                    <input type="number" step="any" id="inputDynamicParam" required placeholder="前次: 85 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                                    <input type="number" step="any" id="inputDynamicParam" required placeholder="請輸入數值" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
                                 </div>
                                 <div>
                                     <label class="block text-slate-300 font-medium mb-1.5">排煙溫度 (°C)</label>
-                                    <input type="number" step="any" id="inputFlueTemp" required placeholder="前次: 150 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                                    <input type="number" step="any" id="inputFlueTemp" required placeholder="例: 150 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
                                 </div>
                                 <div>
                                     <label class="block text-slate-300 font-medium mb-1.5">給水溫度 (°C)</label>
-                                    <input type="number" step="any" id="inputWaterTemp" required placeholder="前次: 60 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                                    <input type="number" step="any" id="inputWaterTemp" required placeholder="例: 60 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
                                 </div>
                                 <div>
                                     <label class="block text-slate-300 font-medium mb-1.5">水質硬度 (ppm)</label>
-                                    <input type="number" step="any" id="inputHardness" required placeholder="前次: 15 ppm" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                                    <input type="number" step="any" id="inputHardness" required placeholder="例: 15 ppm" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
                                 </div>
                             </div>
 
@@ -604,27 +608,35 @@
 
     <!-- 腳本邏輯 -->
     <script>
-        // 1. 初始化資料與狀態
-        let boilers = JSON.parse(localStorage.getItem('sf_boilers')) || [
-            { id: 'b1', name: '#1 貫流式鍋爐 (1.0 Ton/hr)', type: 'steam', detail: '型號: SF-1000Steam | 額定蒸氣壓: 0.8 MPa' },
-            { id: 'b2', name: '#2 熱水鍋爐 (50萬 Kcal)', type: 'hotwater', detail: '型號: SF-500HW | 常用出水溫: 85°C' }
+        // 預設設備資料
+        let rawBoilers = JSON.parse(localStorage.getItem('sf_boilers')) || [
+            { id: '#1 貫流式鍋爐 (1.0 Ton/hr)', name: '#1 貫流式鍋爐 (1.0 Ton/hr)', type: 'steam', detail: '型號: SF-1000Steam | 額定蒸氣壓: 0.8 MPa' },
+            { id: '#2 熱水鍋爐 (50萬 Kcal)', name: '#2 熱水鍋爐 (50萬 Kcal)', type: 'hotwater', detail: '型號: SF-500HW | 常用出水溫: 85°C' },
+            { id: '#3 熱水鍋爐 (50萬 Kcal)', name: '#3 熱水鍋爐 (50萬 Kcal)', type: 'hotwater', detail: '型號: SF-500HW | 常用出水溫: 85°C' },
+            { id: '#4 熱水鍋爐 (100萬 Kcal)', name: '#4 熱水鍋爐 (100萬 Kcal)', type: 'hotwater', detail: '型號: SF-100HW | 常用出水溫: 65°C' }
         ];
-        let currentBoilerId = localStorage.getItem('sf_current_boiler') || boilers[0].id;
-        
-        let inspectionRecords = JSON.parse(localStorage.getItem('sf_inspections')) || {
-            'b1': [
-                { date: '2026-07-21', dynamicParam: 0.75, flueTemp: 165, waterTemp: 65, inspector: '張工程師' },
-                { date: '2026-07-20', dynamicParam: 0.72, flueTemp: 160, waterTemp: 62, inspector: '張工程師' }
-            ],
-            'b2': [
-                { date: '2026-07-21', dynamicParam: 85, flueTemp: 145, waterTemp: 58, inspector: '張工程師' },
-                { date: '2026-07-20', dynamicParam: 84, flueTemp: 142, waterTemp: 55, inspector: '張工程師' }
-            ]
-        };
 
-        let maintenanceRecords = JSON.parse(localStorage.getItem('sf_maintenances')) || [
-            { id: 'm1', boilerId: 'b1', date: '2026-07-15', type: '定期保養', title: '燃燒機噴嘴清洗與濾網更換', status: '已完成', tech: '碩豐工程-陳技師', cost: 3500, notes: '運轉正常', photoBefore: '', photoAfter: '' }
-        ];
+        // 1. 自動清除歷史重複名稱的設備，確保「名稱唯一」
+        let boilers = [];
+        let seenNames = new Set();
+        rawBoilers.forEach(b => {
+            const cleanName = b.name.trim();
+            if (!seenNames.has(cleanName)) {
+                seenNames.add(cleanName);
+                boilers.push({
+                    id: cleanName,
+                    name: cleanName,
+                    type: b.type || 'hotwater',
+                    detail: b.detail || ''
+                });
+            }
+        });
+        localStorage.setItem('sf_boilers', JSON.stringify(boilers));
+
+        let currentBoilerId = localStorage.getItem('sf_current_boiler') || boilers[0].name;
+
+        let inspectionRecords = JSON.parse(localStorage.getItem('sf_inspections')) || {};
+        let maintenanceRecords = JSON.parse(localStorage.getItem('sf_maintenances')) || [];
 
         let reminderConfig = JSON.parse(localStorage.getItem('sf_reminder_config')) || {
             enabled: true,
@@ -635,22 +647,31 @@
         };
 
         let trendChart = null;
-        let qrCodeObj = null;
+        let qrcodeObj = null;
 
         // 初始化頁面
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentDateStr').innerText = new Date().toISOString().split('T')[0];
             document.getElementById('maintInputDate').value = new Date().toISOString().split('T')[0];
-            
-            // 🔍 解析網址 QR Code 參數 (例如: ?boiler=b1)
+
+            // 2. 解析網址 QR Code 參數 (以設備名稱精準比對)
             const urlParams = new URLSearchParams(window.location.search);
             const boilerParam = urlParams.get('boiler');
 
-            if (boilerParam && boilers.some(b => b.id === boilerParam)) {
-                currentBoilerId = boilerParam;
-                localStorage.setItem('sf_current_boiler', currentBoilerId);
-                const notice = document.getElementById('qrScanNotice');
-                if (notice) notice.classList.remove('hidden');
+            if (boilerParam) {
+                const decodedName = decodeURIComponent(boilerParam).trim();
+                const matched = boilers.find(b => b.name === decodedName);
+                if (matched) {
+                    currentBoilerId = matched.name;
+                    localStorage.setItem('sf_current_boiler', currentBoilerId);
+                    const notice = document.getElementById('qrScanNotice');
+                    if (notice) notice.classList.remove('hidden');
+                }
+            }
+
+            // 確保 currentBoilerId 在列表中存在
+            if (!boilers.some(b => b.name === currentBoilerId)) {
+                currentBoilerId = boilers[0].name;
             }
 
             renderBoilerSelect();
@@ -684,14 +705,11 @@
             }
         }
 
-        // 設備管理視窗 toggle
         function toggleBoilerManager() {
             document.getElementById('boilerManagerBox').classList.toggle('hidden');
-            // 關閉管理視窗時隱藏 QR 碼
             document.getElementById('qrCodeContainer').classList.add('hidden');
         }
 
-        // 巡檢員編輯 toggle
         function toggleInspectorForm() {
             document.getElementById('inspectorFormBox').classList.toggle('hidden');
         }
@@ -709,7 +727,7 @@
         // 渲染設備下拉選單
         function renderBoilerSelect() {
             const select = document.getElementById('leftBoilerSelect');
-            select.innerHTML = boilers.map(b => `<option value="${b.id}" ${b.id === currentBoilerId ? 'selected' : ''}>${b.name}</option>`).join('');
+            select.innerHTML = boilers.map(b => `<option value="${b.name}" ${b.name === currentBoilerId ? 'selected' : ''}>${b.name}</option>`).join('');
         }
 
         // 設備變更
@@ -717,11 +735,12 @@
             currentBoilerId = document.getElementById('leftBoilerSelect').value;
             localStorage.setItem('sf_current_boiler', currentBoilerId);
             updateUIByCurrentBoiler();
+            document.getElementById('qrCodeContainer').classList.add('hidden');
         }
 
         // 更新 UI 資訊
         function updateUIByCurrentBoiler() {
-            const b = boilers.find(x => x.id === currentBoilerId);
+            const b = boilers.find(x => x.name === currentBoilerId);
             if (!b) return;
 
             document.getElementById('headerBoilerTitle').innerText = b.name;
@@ -736,28 +755,27 @@
             const labelText = isSteam ? '蒸氣壓力 (MPa)' : '熱水出水溫度 (°C)';
             document.getElementById('lblDynamicParam').innerText = labelText;
             document.getElementById('thDynamicParam').innerText = labelText;
-            document.getElementById('inputDynamicParam').placeholder = isSteam ? '前次: 0.75 MPa' : '前次: 85 °C';
 
             renderInspectionHistory();
             updateChart();
             renderMaintenanceTable();
         }
 
-        // 🖨️ 生成專屬 QR Code 核心邏輯
+        // 🖨️ 生成專屬 QR Code (使用設備名稱同步)
         function generateQRCodeForCurrentBoiler() {
-            const name = document.getElementById('editBoilerName').value || '未命名設備';
-            const baseUrl = window.location.href.split('?')[0];
-            const qrTargetUrl = `${baseUrl}?boiler=${currentBoilerId}`;
+            const b = boilers.find(x => x.name === currentBoilerId);
+            if (!b) return;
 
-            document.getElementById('qrCodeTitleDisplay').innerText = `${name} 專屬 QR Code`;
+            const baseUrl = window.location.origin + window.location.pathname;
+            const qrTargetUrl = `${baseUrl}?boiler=${encodeURIComponent(b.name)}`;
+
+            document.getElementById('qrCodeTitleDisplay').innerText = `${b.name} 專屬 QR Code`;
             document.getElementById('qrCodeUrlText').innerText = qrTargetUrl;
 
-            // 清空舊的 QR 碼元素
             const container = document.getElementById('qrcode');
             container.innerHTML = '';
 
-            // 使用 QRCode.js 畫圖
-            qrCodeObj = new QRCode(container, {
+            qrcodeObj = new QRCode(container, {
                 text: qrTargetUrl,
                 width: 140,
                 height: 140,
@@ -769,7 +787,6 @@
             document.getElementById('qrCodeContainer').classList.remove('hidden');
         }
 
-        // 下載 QR Code 圖片
         function downloadQRCode() {
             const img = document.querySelector('#qrcode img');
             const canvas = document.querySelector('#qrcode canvas');
@@ -793,43 +810,115 @@
             }
         }
 
-        // 儲存目前修改的設備
+        // 儲存目前修改的設備 (名稱防重)
         function saveCurrentBoilerName() {
-            const b = boilers.find(x => x.id === currentBoilerId);
+            const newName = document.getElementById('editBoilerName').value.trim();
+            if (!newName) {
+                alert('設備名稱不可為空！');
+                return;
+            }
+
+            // 檢查名稱是否與其他設備重複
+            const isDuplicate = boilers.some(b => b.name === newName && b.name !== currentBoilerId);
+            if (isDuplicate) {
+                alert(`⚠️ 設備名稱「${newName}」已經存在！請使用唯一的設備名稱。`);
+                return;
+            }
+
+            const b = boilers.find(x => x.name === currentBoilerId);
             if (b) {
-                b.name = document.getElementById('editBoilerName').value;
+                const oldName = b.name;
+                b.name = newName;
+                b.id = newName;
                 b.type = document.getElementById('editBoilerType').value;
                 b.detail = document.getElementById('editBoilerDetail').value;
+
+                // 轉移巡檢與保養紀錄 key
+                if (oldName !== newName) {
+                    if (inspectionRecords[oldName]) {
+                        inspectionRecords[newName] = inspectionRecords[oldName];
+                        delete inspectionRecords[oldName];
+                    }
+                    maintenanceRecords.forEach(m => {
+                        if (m.boilerId === oldName) m.boilerId = newName;
+                    });
+                }
+
+                currentBoilerId = newName;
                 localStorage.setItem('sf_boilers', JSON.stringify(boilers));
+                localStorage.setItem('sf_inspections', JSON.stringify(inspectionRecords));
+                localStorage.setItem('sf_maintenances', JSON.stringify(maintenanceRecords));
+                localStorage.setItem('sf_current_boiler', currentBoilerId);
+
                 renderBoilerSelect();
                 updateUIByCurrentBoiler();
-                alert('設備資訊已成功儲存！');
+                alert('設備資訊修改成功！');
             }
         }
 
-        // 新增新設備
+        // 新增為新設備 (名稱唯一防呆)
         function addNewBoiler() {
-            const newId = 'b_' + Date.now();
+            const newName = document.getElementById('editBoilerName').value.trim();
+            if (!newName) {
+                alert('請先輸入新設備的名稱！');
+                return;
+            }
+
+            // 防呆：名稱必須唯一
+            const exists = boilers.some(b => b.name === newName);
+            if (exists) {
+                alert(`⚠️ 設備「${newName}」已經存在，不能新增同名設備！`);
+                return;
+            }
+
             const newB = {
-                id: newId,
-                name: document.getElementById('editBoilerName').value || '新設備',
+                id: newName,
+                name: newName,
                 type: document.getElementById('editBoilerType').value,
                 detail: document.getElementById('editBoilerDetail').value
             };
+
             boilers.push(newB);
-            currentBoilerId = newId;
-            inspectionRecords[newId] = [];
+            currentBoilerId = newName;
+            inspectionRecords[newName] = [];
+
             localStorage.setItem('sf_boilers', JSON.stringify(boilers));
             localStorage.setItem('sf_inspections', JSON.stringify(inspectionRecords));
             localStorage.setItem('sf_current_boiler', currentBoilerId);
-            
+
             renderBoilerSelect();
             updateUIByCurrentBoiler();
             generateQRCodeForCurrentBoiler();
-            alert('成功新增設備！已同步產生新設備的 QR Code。');
+            alert('🎉 成功新增設備！已自動產生該設備的專屬 QR Code。');
         }
 
-        // 提交日常巡檢
+        // 刪除目前設備
+        function deleteCurrentBoiler() {
+            if (boilers.length <= 1) {
+                alert('⚠️ 至少需要保留一台設備，無法全部刪除。');
+                return;
+            }
+
+            if (confirm(`確定要刪除設備「${currentBoilerId}」嗎？此動作無法復原。`)) {
+                boilers = boilers.filter(b => b.name !== currentBoilerId);
+                delete inspectionRecords[currentBoilerId];
+                maintenanceRecords = maintenanceRecords.filter(m => m.boilerId !== currentBoilerId);
+
+                currentBoilerId = boilers[0].name;
+
+                localStorage.setItem('sf_boilers', JSON.stringify(boilers));
+                localStorage.setItem('sf_inspections', JSON.stringify(inspectionRecords));
+                localStorage.setItem('sf_maintenances', JSON.stringify(maintenanceRecords));
+                localStorage.setItem('sf_current_boiler', currentBoilerId);
+
+                renderBoilerSelect();
+                updateUIByCurrentBoiler();
+                document.getElementById('qrCodeContainer').classList.add('hidden');
+                alert('設備已刪除。');
+            }
+        }
+
+        // 提交巡檢
         function submitInspection(e) {
             e.preventDefault();
             const dynParam = parseFloat(document.getElementById('inputDynamicParam').value);
@@ -875,7 +964,6 @@
             }
         }
 
-        // 渲染巡檢歷史
         function renderInspectionHistory() {
             const list = inspectionRecords[currentBoilerId] || [];
             const tbody = document.getElementById('inspectionHistoryBody');
@@ -890,7 +978,6 @@
             `).join('');
         }
 
-        // 照片預覽處理
         function previewImage(input, imgId, placeholderId) {
             const file = input.files[0];
             if (file) {
@@ -905,7 +992,6 @@
             }
         }
 
-        // 提交維修工單
         function submitMaintenance(e) {
             e.preventDefault();
             const date = document.getElementById('maintInputDate').value;
@@ -940,7 +1026,6 @@
             document.getElementById('previewAfterPlaceholder').classList.remove('hidden');
         }
 
-        // 渲染維修履歷表格與 KPI
         function renderMaintenanceTable() {
             const filtered = maintenanceRecords.filter(m => m.boilerId === currentBoilerId);
             
@@ -991,7 +1076,6 @@
             }
         }
 
-        // 巡檢提醒與排程邏輯
         function initReminderUI() {
             document.getElementById('reminderToggle').checked = reminderConfig.enabled;
             document.getElementById('reminderTime').value = reminderConfig.time || '08:00';
@@ -1061,7 +1145,6 @@
             alert('巡檢提醒與排程設定已成功更新！');
         }
 
-        // Modal 照片查看
         function openImageModal(src) {
             document.getElementById('modalImg').src = src;
             document.getElementById('imageModal').classList.remove('hidden');
@@ -1071,7 +1154,6 @@
             document.getElementById('imageModal').classList.add('hidden');
         }
 
-        // 初始化與更新 Chart.js 圖表
         function initChart() {
             const ctx = document.getElementById('inspectionTrendChart').getContext('2d');
             trendChart = new Chart(ctx, {
@@ -1099,7 +1181,7 @@
         function updateChart() {
             if (!trendChart) return;
             const list = [...(inspectionRecords[currentBoilerId] || [])].reverse();
-            const b = boilers.find(x => x.id === currentBoilerId);
+            const b = boilers.find(x => x.name === currentBoilerId);
             
             trendChart.data.labels = list.map(i => i.date);
             trendChart.data.datasets[0].data = list.map(i => i.flueTemp);
