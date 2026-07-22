@@ -8,8 +8,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome 圖示 CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- QRCode.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
@@ -46,7 +63,7 @@
                     <label for="leftBoilerSelect" class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                         <i class="fa-solid fa-industry text-sky-400"></i> 當前巡檢設備：
                     </label>
-                    <button onclick="toggleBoilerManager()" class="text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-1 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
+                    <button onclick="toggleBoilerManager()" class="text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-1 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20 transition-colors">
                         <i class="fa-solid fa-gear"></i> 管理
                     </button>
                 </div>
@@ -65,14 +82,14 @@
                 </div>
 
                 <!-- 設備新增/修改與 QR Code 產生視窗 -->
-                <div id="boilerManagerBox" class="hidden p-3 mt-2 bg-slate-900 rounded-lg border border-sky-500/30 text-xs space-y-3">
+                <div id="boilerManagerBox" class="hidden p-3 mt-2 bg-slate-900 rounded-lg border border-sky-500/30 text-xs space-y-3 shadow-xl">
                     <div class="font-bold text-slate-200 flex justify-between items-center border-b border-slate-800 pb-1.5">
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square text-sky-400"></i> 設備項目管理</span>
                         <button onclick="toggleBoilerManager()" class="text-slate-400 hover:text-white">✕</button>
                     </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-0.5">設備名稱：</label>
-                        <input type="text" id="editBoilerName" placeholder="輸入設備名稱..." class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs">
+                        <input type="text" id="editBoilerName" placeholder="輸入設備名稱..." class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-0.5">鍋爐類型：</label>
@@ -83,20 +100,24 @@
                     </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-0.5">設備規格 / 備註資訊：</label>
-                        <textarea id="editBoilerDetail" rows="2" placeholder="例: 型號: SF-199HW | 常用出水溫: 65°C" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none"></textarea>
+                        <textarea id="editBoilerDetail" rows="2" placeholder="例: 型號: SF-199HW | 常用出水溫: 65°C" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none focus:border-sky-500"></textarea>
                     </div>
 
                     <div class="flex gap-2 pt-1">
-                        <button onclick="saveCurrentBoilerName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-1.5 rounded text-[11px] font-medium">儲存修改</button>
-                        <button onclick="addNewBoiler()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded text-[11px] font-medium">新增為新設備</button>
+                        <button onclick="saveCurrentBoilerName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-1.5 rounded text-[11px] font-medium transition-colors">儲存修改</button>
+                        <button onclick="addNewBoiler()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded text-[11px] font-medium transition-colors">新增為新設備</button>
                     </div>
 
+                    <button onclick="deleteCurrentBoiler()" class="w-full bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/50 py-1 rounded text-[10px] flex items-center justify-center gap-1 transition-colors">
+                        <i class="fa-solid fa-trash-can"></i> 刪除此設備
+                    </button>
+
                     <!-- 🖨️ 生成專屬 QR Code 按鈕 -->
-                    <button onclick="generateQRCodeForCurrentBoiler()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 rounded text-[11px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20">
+                    <button onclick="generateQRCodeForCurrentBoiler()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 rounded text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-indigo-600/20">
                         <i class="fa-solid fa-qrcode"></i> 生成專屬 QR Code
                     </button>
 
-                    <!-- QR Code 顯示區 -->
+                    <!-- QR Code 顯示與下載區域 -->
                     <div id="qrCodeContainer" class="hidden pt-3 border-t border-slate-800 text-center space-y-2">
                         <p class="text-[10px] font-bold text-indigo-300 flex items-center justify-center gap-1">
                             <i class="fa-solid fa-mobile-screen-button"></i> <span id="qrCodeTitleDisplay">設備專屬 QR Code</span>
@@ -111,16 +132,38 @@
 
             <!-- 選單項目 -->
             <nav class="p-4 space-y-1">
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-sky-600 text-white">
-                    <i class="fa-solid fa-clipboard-check w-5 text-sky-300"></i> 日常巡檢填報
+                <a href="#" onclick="switchTab('inspection')" id="nav-inspection" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors bg-brand-600 text-white">
+                    <i class="fa-solid fa-clipboard-check w-5 text-sky-400"></i> 日常巡檢填報
+                </a>
+                <a href="#" onclick="switchTab('trends')" id="nav-trends" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-chart-line w-5 text-emerald-400"></i> 巡檢數據與趨勢
+                </a>
+                <a href="#" onclick="switchTab('maintenance')" id="nav-maintenance" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-wrench w-5 text-amber-400"></i> 維修保養履歷
                 </a>
             </nav>
+        </div>
+
+        <!-- 底部巡檢員資訊 -->
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-sky-600/30 border border-sky-500/50 flex items-center justify-center text-xs font-bold text-sky-300">巡</div>
+                    <div class="text-xs">
+                        <p class="text-white font-medium flex items-center gap-1">
+                            <span id="inspectorName">張工程師</span>
+                        </p>
+                        <p class="text-slate-400 text-[10px]" id="inspectorDept">廠區維護組</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </aside>
 
     <!-- 主要內容區塊 -->
     <main class="flex-1 flex flex-col overflow-hidden bg-slate-900 w-full min-w-0">
         
+        <!-- Header -->
         <header class="border-b border-slate-800 bg-slate-950/40 px-4 lg:px-6 py-3 shrink-0 flex items-center justify-between gap-2">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="lg:hidden text-slate-300 hover:text-white p-1.5 rounded bg-slate-800 border border-slate-700">
@@ -129,37 +172,76 @@
 
                 <div class="flex flex-wrap items-center gap-1.5">
                     <span class="text-xs text-slate-400 hidden sm:inline">當前選擇：</span>
-                    <span id="headerBoilerTitle" class="text-xs sm:text-sm font-bold text-sky-400 truncate">載入中...</span>
+                    <span id="headerBoilerTitle" class="text-xs sm:text-sm font-bold text-sky-400 truncate max-w-[160px] sm:max-w-none">載入中...</span>
                     <span id="headerBoilerBadge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium">熱水鍋爐</span>
                     <span id="qrScanNotice" class="hidden text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                        <i class="fa-solid fa-circle-check"></i> QR 碼掃描成功
+                        <i class="fa-solid fa-circle-check"></i> QR 碼自動切換成功
                     </span>
                 </div>
             </div>
         </header>
 
+        <!-- 頁籤內容區 -->
         <div class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
-            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
-                <h2 class="font-semibold text-slate-100 flex items-center gap-2 text-base mb-4">
-                    <i class="fa-solid fa-pen-to-square text-sky-400"></i> 新增巡檢紀錄
-                </h2>
-                <form onsubmit="alert('儲存成功！'); return false;" class="space-y-4 text-xs">
-                    <div>
-                        <label class="block text-slate-300 font-medium mb-1">熱水出水溫度 (°C)</label>
-                        <input type="number" required placeholder="請輸入數值" class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white">
+
+            <!-- TAB 1: 巡檢資料填報 -->
+            <div id="tab-inspection" class="tab-content space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div class="lg:col-span-5 bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
+                        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-700">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2 text-base">
+                                <i class="fa-solid fa-pen-to-square text-sky-400"></i> 新增日常巡檢紀錄
+                            </h2>
+                            <span class="text-xs text-slate-400 font-mono" id="currentDateStr">2026-07-21</span>
+                        </div>
+
+                        <form id="inspectionForm" onsubmit="submitInspection(event)" class="space-y-5">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+                                <div>
+                                    <label id="lblDynamicParam" class="block text-slate-300 font-medium mb-1.5">熱水出水溫度 (°C)</label>
+                                    <input type="number" step="any" id="inputDynamicParam" required placeholder="請輸入數值" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 font-medium mb-1.5">排煙溫度 (°C)</label>
+                                    <input type="number" step="any" id="inputFlueTemp" required placeholder="例: 150 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg transition-all text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-600/20">
+                                <i class="fa-solid fa-paper-plane"></i> 儲存巡檢紀錄
+                            </button>
+                        </form>
                     </div>
-                    <div>
-                        <label class="block text-slate-300 font-medium mb-1">排煙溫度 (°C)</label>
-                        <input type="number" required placeholder="例: 150 °C" class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white">
-                    </div>
-                    <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded shadow-lg">儲存紀錄</button>
-                </form>
+                </div>
             </div>
+
+            <!-- TAB 2: 巡檢數據與趨勢 -->
+            <div id="tab-trends" class="tab-content hidden space-y-6">
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
+                    <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期數據趨勢分析
+                    </h3>
+                    <div class="h-64 flex items-center justify-center text-slate-500 text-xs border border-dashed border-slate-700 rounded-lg">
+                        圖表渲染區域 (巡檢數據正常紀錄中)
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: 維修保養履歷 -->
+            <div id="tab-maintenance" class="tab-content hidden space-y-6">
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
+                    <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-wrench text-amber-400"></i> 保養履歷紀錄
+                    </h3>
+                    <p class="text-xs text-slate-400">目前尚無異常維修紀錄。</p>
+                </div>
+            </div>
+
         </div>
     </main>
 
     <script>
-        // 預設 5 台設備，固定使用 1~5 號索引，絕對不跑掉
+        // 預設 5 台設備，固定使用 1~5 號索引
         const defaultBoilers = [
             { id: '1', name: '#1 貫流式鍋爐 (1.0 Ton/hr)', type: 'steam', detail: '型號: SF-1000Steam' },
             { id: '2', name: '#2 熱水鍋爐 (50萬 Kcal)', type: 'hotwater', detail: '型號: SF-500HW' },
@@ -171,20 +253,19 @@
         let boilers = JSON.parse(localStorage.getItem('sf_boilers_v3')) || defaultBoilers;
         localStorage.setItem('sf_boilers_v3', JSON.stringify(boilers));
 
-        let currentBoilerId = '1'; // 預設 1 號
+        let currentBoilerId = '1';
 
-        // 🎯 核心演算法：多重捕捉網址中的任何數字（無視掃描器亂加參數）
+        // 🎯 超強網址相容解析：從 ?b=5 或 URL 任意位置精準取得數字 5
         function detectBoilerFromURL() {
             const url = window.location.href;
-            console.log("偵測網址：", url);
 
-            // 1. 抓取正則標準的 ?b=5 或 ?boiler=5 或 ?id=5
+            // 1. 優先匹配 ?b=5 或 ?boiler=5 或 ?id=5
             const paramMatch = url.match(/[?&](?:b|boiler|id)=([0-9]+)/i);
             if (paramMatch && paramMatch[1]) {
                 return paramMatch[1];
             }
 
-            // 2. 備用抓取：如果掃描器轉碼成 %235 或把網址搞亂，抓最後出現的數字
+            // 2. 備用匹配：若 QR Code 轉碼成 %235，強行捕捉結尾的數字
             const numberMatch = url.match(/(?:%23|#|\/)?([1-9][0-9]*)(?:[^0-9]*)$/);
             if (numberMatch && numberMatch[1]) {
                 return numberMatch[1];
@@ -193,21 +274,20 @@
             return null;
         }
 
-        // 初始化
-        window.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentDateStr').innerText = new Date().toISOString().split('T')[0];
+
             const scannedId = detectBoilerFromURL();
 
             if (scannedId) {
-                // 如果網址有帶數字，強行指定為該設備
                 const target = boilers.find(b => b.id === scannedId);
                 if (target) {
                     currentBoilerId = target.id;
                     document.getElementById('qrScanNotice').classList.remove('hidden');
                 } else {
-                    currentBoilerId = scannedId; // 支援新動態設備
+                    currentBoilerId = scannedId;
                 }
             } else {
-                // 如果是正常開啟，才讀取 LocalStorage 上次選擇的
                 currentBoilerId = localStorage.getItem('sf_current_boiler_id') || '1';
             }
 
@@ -225,6 +305,21 @@
             document.getElementById('qrCodeContainer').classList.add('hidden');
         }
 
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-brand-600', 'text-white');
+                el.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-brand-600', 'text-white');
+                activeNav.classList.remove('text-slate-400');
+            }
+        }
+
         function renderBoilerSelect() {
             const select = document.getElementById('leftBoilerSelect');
             select.innerHTML = boilers.map(b => `<option value="${b.id}" ${b.id === currentBoilerId ? 'selected' : ''}>${b.name}</option>`).join('');
@@ -239,25 +334,28 @@
 
         function updateUIByCurrentBoiler() {
             const b = boilers.find(x => x.id === currentBoilerId) || boilers[0];
-            
+
             document.getElementById('headerBoilerTitle').innerText = b.name;
             document.getElementById('headerBoilerBadge').innerText = b.type === 'steam' ? '蒸氣鍋爐' : '熱水鍋爐';
-            document.getElementById('leftBoilerDetailDisplay').innerText = b.detail || '無規格資訊';
+            document.getElementById('leftBoilerDetailDisplay').innerText = b.detail || '暫無規格資訊';
 
             document.getElementById('editBoilerName').value = b.name;
             document.getElementById('editBoilerType').value = b.type;
             document.getElementById('editBoilerDetail').value = b.detail || '';
+
+            // 動態切換表單動態文字
+            const lbl = document.getElementById('lblDynamicParam');
+            if (lbl) {
+                lbl.innerText = b.type === 'steam' ? '蒸氣壓力 (kg/cm²)' : '熱水出水溫度 (°C)';
+            }
         }
 
-        // 🖨️ 生成極簡超高辨識度 QR Code (格式：https://yourdomain.com/?b=5)
+        // 🖨️ 生成極簡安全的專屬 QR Code
         function generateQRCodeForCurrentBoiler() {
             const b = boilers.find(x => x.id === currentBoilerId);
             if (!b) return;
 
-            // 取出主網址 (去掉原本的 ? 參數)
             const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            
-            // 🎯 最精簡網址：?b=5
             const cleanUrl = `${baseUrl}?b=${b.id}`;
 
             document.getElementById('qrCodeTitleDisplay').innerText = `${b.name} 專屬 QR Code`;
@@ -268,8 +366,8 @@
 
             new QRCode(container, {
                 text: cleanUrl,
-                width: 160,
-                height: 160,
+                width: 150,
+                height: 150,
                 colorDark : "#0f172a",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
@@ -287,13 +385,14 @@
                 localStorage.setItem('sf_boilers_v3', JSON.stringify(boilers));
                 renderBoilerSelect();
                 updateUIByCurrentBoiler();
-                alert('已儲存更新！');
+                alert('設備資料已成功更新！');
             }
         }
 
         function addNewBoiler() {
             const name = document.getElementById('editBoilerName').value.trim();
-            if (!name) return alert('請輸入名稱');
+            if (!name) return alert('請輸入設備名稱！');
+
             const nextId = String(boilers.length + 1);
             const newB = {
                 id: nextId,
@@ -301,12 +400,33 @@
                 type: document.getElementById('editBoilerType').value,
                 detail: document.getElementById('editBoilerDetail').value
             };
+
             boilers.push(newB);
             currentBoilerId = nextId;
             localStorage.setItem('sf_boilers_v3', JSON.stringify(boilers));
+            localStorage.setItem('sf_current_boiler_id', currentBoilerId);
+
             renderBoilerSelect();
             updateUIByCurrentBoiler();
             generateQRCodeForCurrentBoiler();
+            alert('成功新增設備！');
+        }
+
+        function deleteCurrentBoiler() {
+            if (boilers.length <= 1) return alert('無法刪除最後一台設備！');
+            if (confirm(`確定要刪除「${currentBoilerId}」嗎？`)) {
+                boilers = boilers.filter(b => b.id !== currentBoilerId);
+                currentBoilerId = boilers[0].id;
+                localStorage.setItem('sf_boilers_v3', JSON.stringify(boilers));
+                localStorage.setItem('sf_current_boiler_id', currentBoilerId);
+                renderBoilerSelect();
+                updateUIByCurrentBoiler();
+            }
+        }
+
+        function submitInspection(e) {
+            e.preventDefault();
+            alert('巡檢紀錄已成功儲存！');
         }
     </script>
 </body>
