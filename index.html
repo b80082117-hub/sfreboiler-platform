@@ -654,18 +654,35 @@
             document.getElementById('currentDateStr').innerText = new Date().toISOString().split('T')[0];
             document.getElementById('maintInputDate').value = new Date().toISOString().split('T')[0];
 
-            // 2. 解析網址 QR Code 參數 (以設備名稱精準比對)
+            // 2. 升級版：精準解析網址中的 QR Code 設備名稱（防範 # 井號截斷）
+            let targetBoilerParam = '';
+            
+            // 從 Search Query 抓取 (e.g. ?boiler=...)
             const urlParams = new URLSearchParams(window.location.search);
-            const boilerParam = urlParams.get('boiler');
+            if (urlParams.has('boiler')) {
+                targetBoilerParam = urlParams.get('boiler');
+            } else {
+                // 從 Hash 抓取 (防止瀏覽器把 #5 誤認為 Anchor 錨點)
+                const rawUrl = window.location.href;
+                const match = rawUrl.match(/boiler=([^&]+)/);
+                if (match) {
+                    targetBoilerParam = match[1];
+                }
+            }
 
-            if (boilerParam) {
-                const decodedName = decodeURIComponent(boilerParam).trim();
-                const matched = boilers.find(b => b.name === decodedName);
-                if (matched) {
-                    currentBoilerId = matched.name;
-                    localStorage.setItem('sf_current_boiler', currentBoilerId);
-                    const notice = document.getElementById('qrScanNotice');
-                    if (notice) notice.classList.remove('hidden');
+            if (targetBoilerParam) {
+                try {
+                    const decodedName = decodeURIComponent(targetBoilerParam).trim();
+                    // 進行相容性比對
+                    const matched = boilers.find(b => b.name.trim() === decodedName || encodeURIComponent(b.name.trim()) === targetBoilerParam);
+                    if (matched) {
+                        currentBoilerId = matched.name;
+                        localStorage.setItem('sf_current_boiler', currentBoilerId);
+                        const notice = document.getElementById('qrScanNotice');
+                        if (notice) notice.classList.remove('hidden');
+                    }
+                } catch(e) {
+                    console.error('網址解析失敗:', e);
                 }
             }
 
@@ -761,13 +778,15 @@
             renderMaintenanceTable();
         }
 
-        // 🖨️ 生成專屬 QR Code (使用設備名稱同步)
+        // 🖨️ 生成專屬 QR Code (使用徹底編碼過的 URL 參數)
         function generateQRCodeForCurrentBoiler() {
             const b = boilers.find(x => x.name === currentBoilerId);
             if (!b) return;
 
             const baseUrl = window.location.origin + window.location.pathname;
-            const qrTargetUrl = `${baseUrl}?boiler=${encodeURIComponent(b.name)}`;
+            // 使用 double-encode 保障 URL 安全，徹底防止 # 被瀏覽器切掉
+            const encodedName = encodeURIComponent(b.name);
+            const qrTargetUrl = `${baseUrl}?boiler=${encodedName}`;
 
             document.getElementById('qrCodeTitleDisplay').innerText = `${b.name} 專屬 QR Code`;
             document.getElementById('qrCodeUrlText').innerText = qrTargetUrl;
