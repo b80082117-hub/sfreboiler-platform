@@ -77,7 +77,7 @@
                         <span class="font-medium text-slate-300">設備規格與備註：</span>
                     </div>
                     <p id="leftBoilerDetailDisplay" class="text-slate-300 font-mono leading-relaxed pl-3.5 break-words">
-                        加載中...
+                        載入中...
                     </p>
                 </div>
 
@@ -100,7 +100,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-0.5">設備規格 / 備註資訊：</label>
-                        <textarea id="editBoilerDetail" rows="2" placeholder="例: 型號: SF-199HW | 常用出水溫: 65°C" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none focus:border-sky-500"></textarea>
+                        <textarea id="editBoilerDetail" rows="2" placeholder="例: 型號: SF-100HW" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none focus:border-sky-500"></textarea>
                     </div>
 
                     <div class="flex gap-2 pt-1">
@@ -112,7 +112,7 @@
                         <i class="fa-solid fa-trash-can"></i> 刪除此設備
                     </button>
 
-                    <!-- 🖨️ 生成專屬 QR Code 按鈕 -->
+                    <!-- 生成專屬 QR Code 按鈕 -->
                     <button onclick="generateQRCodeForCurrentBoiler()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 rounded text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-indigo-600/20">
                         <i class="fa-solid fa-qrcode"></i> 生成專屬 QR Code
                     </button>
@@ -195,6 +195,7 @@
                     </div>
 
                     <form id="inspectionForm" onsubmit="submitInspection(event)" class="space-y-5">
+                        <!-- 第一列：主要溫度/壓力與硬度 -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
                             <div>
                                 <label id="lblDynamicParam" class="block text-slate-300 font-medium mb-1.5">熱水出水溫度 (°C)</label>
@@ -210,14 +211,11 @@
                             </div>
                         </div>
 
+                        <!-- 第二列：入水溫度與燃燒狀況 (已將水位狀態替換為入水溫度) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
                             <div>
-                                <label class="block text-slate-300 font-medium mb-1.5">水位狀態</label>
-                                <select id="selectWaterLevel" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none">
-                                    <option value="正常">正常 (安全範圍內)</option>
-                                    <option value="偏高">偏高</option>
-                                    <option value="偏低">偏低</option>
-                                </select>
+                                <label class="block text-slate-300 font-medium mb-1.5">給水/入水溫度 (°C)</label>
+                                <input type="number" step="any" id="inputInletTemp" placeholder="例: 25 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
                             </div>
                             <div>
                                 <label class="block text-slate-300 font-medium mb-1.5">燃燒狀況 / 火焰顏色</label>
@@ -256,7 +254,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: 維修保養履歷 (完整表格與新增表單) -->
+            <!-- TAB 3: 維修保養履歷 -->
             <div id="tab-maintenance" class="tab-content hidden space-y-6">
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
@@ -310,7 +308,6 @@
                                 </tr>
                             </thead>
                             <tbody id="maintTableBody" class="divide-y divide-slate-800 text-slate-300">
-                                <!-- 動態載入 -->
                             </tbody>
                         </table>
                     </div>
@@ -321,7 +318,6 @@
     </main>
 
     <script>
-        // 預設 5 台設備
         const defaultBoilers = [
             { id: '1', name: '#1 貫流式鍋爐 (1.0 Ton/hr)', type: 'steam', detail: '型號: SF-1000Steam' },
             { id: '2', name: '#2 熱水鍋爐 (50萬 Kcal)', type: 'hotwater', detail: '型號: SF-500HW' },
@@ -336,14 +332,12 @@
         let currentBoilerId = '1';
         let trendChartInstance = null;
 
-        // 預設模擬的保養履歷資料
         let maintenanceLogs = JSON.parse(localStorage.getItem('sf_maint_logs')) || {
             '1': [{ date: '2026-06-10', type: '定期保養', content: '年度大保養、更換安全閥', inspector: '張工程師' }],
             '2': [{ date: '2026-05-15', type: '零件更換', content: '更換點火電極與電磁閥', inspector: '李工程師' }],
             '4': [{ date: '2026-07-01', type: '水質清洗', content: '酸洗鍋爐積垢、測試水質硬度', inspector: '張工程師' }]
         };
 
-        // 🎯 核心演算法：解析 QR Code 網址 ?b=4 或 ?boiler=4
         function detectBoilerFromURL() {
             const url = window.location.href;
             const paramMatch = url.match(/[?&](?:b|boiler|id)=([0-9]+)/i);
@@ -443,7 +437,6 @@
             if (trendChartInstance) updateChartData();
         }
 
-        // 📈 Chart.js 圖表初始化與更新
         function initChart() {
             const ctx = document.getElementById('trendChart').getContext('2d');
             trendChartInstance = new Chart(ctx, {
@@ -497,7 +490,6 @@
             trendChartInstance.update();
         }
 
-        // 🔧 維修履歷渲染與儲存
         function renderMaintenanceLogs() {
             const tbody = document.getElementById('maintTableBody');
             const logs = maintenanceLogs[currentBoilerId] || [];
@@ -542,7 +534,6 @@
             alert('維修保養履歷儲存成功！');
         }
 
-        // 🖨️ 生成專屬 QR Code
         function generateQRCodeForCurrentBoiler() {
             const b = boilers.find(x => x.id === currentBoilerId);
             if (!b) return;
