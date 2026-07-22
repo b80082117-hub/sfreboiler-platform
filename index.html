@@ -117,7 +117,7 @@
                         <i class="fa-solid fa-qrcode"></i> 生成專屬 QR Code
                     </button>
 
-                    <!-- QR Code 顯示與下載區域 -->
+                    <!-- QR Code 顯示區 -->
                     <div id="qrCodeContainer" class="hidden pt-3 border-t border-slate-800 text-center space-y-2">
                         <p class="text-[10px] font-bold text-indigo-300 flex items-center justify-center gap-1">
                             <i class="fa-solid fa-mobile-screen-button"></i> <span id="qrCodeTitleDisplay">設備專屬 QR Code</span>
@@ -175,7 +175,7 @@
                     <span id="headerBoilerTitle" class="text-xs sm:text-sm font-bold text-sky-400 truncate max-w-[160px] sm:max-w-none">載入中...</span>
                     <span id="headerBoilerBadge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium">熱水鍋爐</span>
                     <span id="qrScanNotice" class="hidden text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                        <i class="fa-solid fa-circle-check"></i> QR 碼自動切換成功
+                        <i class="fa-solid fa-circle-check"></i> QR 碼掃描成功
                     </span>
                 </div>
             </div>
@@ -186,54 +186,134 @@
 
             <!-- TAB 1: 巡檢資料填報 -->
             <div id="tab-inspection" class="tab-content space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div class="lg:col-span-5 bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
-                        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-700">
-                            <h2 class="font-semibold text-slate-100 flex items-center gap-2 text-base">
-                                <i class="fa-solid fa-pen-to-square text-sky-400"></i> 新增日常巡檢紀錄
-                            </h2>
-                            <span class="text-xs text-slate-400 font-mono" id="currentDateStr">2026-07-21</span>
+                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
+                    <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-700">
+                        <h2 class="font-semibold text-slate-100 flex items-center gap-2 text-base">
+                            <i class="fa-solid fa-pen-to-square text-sky-400"></i> 新增日常巡檢紀錄
+                        </h2>
+                        <span class="text-xs text-slate-400 font-mono" id="currentDateStr">2026-07-22</span>
+                    </div>
+
+                    <form id="inspectionForm" onsubmit="submitInspection(event)" class="space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
+                            <div>
+                                <label id="lblDynamicParam" class="block text-slate-300 font-medium mb-1.5">熱水出水溫度 (°C)</label>
+                                <input type="number" step="any" id="inputDynamicParam" required placeholder="請輸入數值" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1.5">排煙溫度 (°C)</label>
+                                <input type="number" step="any" id="inputFlueTemp" required placeholder="例: 150 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1.5">水質硬度 (PPM)</label>
+                                <input type="number" step="any" id="inputHardness" placeholder="例: 0 PPM" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
+                            </div>
                         </div>
 
-                        <form id="inspectionForm" onsubmit="submitInspection(event)" class="space-y-5">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
-                                <div>
-                                    <label id="lblDynamicParam" class="block text-slate-300 font-medium mb-1.5">熱水出水溫度 (°C)</label>
-                                    <input type="number" step="any" id="inputDynamicParam" required placeholder="請輸入數值" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
-                                </div>
-                                <div>
-                                    <label class="block text-slate-300 font-medium mb-1.5">排煙溫度 (°C)</label>
-                                    <input type="number" step="any" id="inputFlueTemp" required placeholder="例: 150 °C" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none transition-colors">
-                                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1.5">水位狀態</label>
+                                <select id="selectWaterLevel" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none">
+                                    <option value="正常">正常 (安全範圍內)</option>
+                                    <option value="偏高">偏高</option>
+                                    <option value="偏低">偏低</option>
+                                </select>
                             </div>
+                            <div>
+                                <label class="block text-slate-300 font-medium mb-1.5">燃燒狀況 / 火焰顏色</label>
+                                <select id="selectBurner" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-sky-500 focus:outline-none">
+                                    <option value="正常 (藍色火焰)">正常 (藍色火焰 / 穩定)</option>
+                                    <option value="異常 (黃紅火焰)">異常 (黃紅火焰 / 偏黃)</option>
+                                    <option value="冒黑煙/異音">冒黑煙 / 震動異音</option>
+                                </select>
+                            </div>
+                        </div>
 
-                            <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg transition-all text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-600/20">
-                                <i class="fa-solid fa-paper-plane"></i> 儲存巡檢紀錄
-                            </button>
-                        </form>
-                    </div>
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1.5 text-xs">巡檢備註與紀錄</label>
+                            <textarea id="inspectionMemo" rows="2" placeholder="無異常，運轉平穩..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-100 text-xs focus:border-sky-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg transition-all text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-600/20">
+                            <i class="fa-solid fa-paper-plane"></i> 儲存巡檢紀錄
+                        </button>
+                    </form>
                 </div>
             </div>
 
-            <!-- TAB 2: 巡檢數據與趨勢 -->
+            <!-- TAB 2: 巡檢數據與趨勢 (Chart.js 圖表區域) -->
             <div id="tab-trends" class="tab-content hidden space-y-6">
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
-                    <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期數據趨勢分析
-                    </h3>
-                    <div class="h-64 flex items-center justify-center text-slate-500 text-xs border border-dashed border-slate-700 rounded-lg">
-                        圖表渲染區域 (巡檢數據正常紀錄中)
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-emerald-400"></i> 近期巡檢數據趨勢分析
+                        </h3>
+                        <span id="chartBoilerLabel" class="text-xs bg-slate-900 text-sky-400 border border-slate-700 px-2 py-1 rounded font-mono"></span>
+                    </div>
+                    <div class="relative h-72 w-full">
+                        <canvas id="trendChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 3: 維修保養履歷 -->
+            <!-- TAB 3: 維修保養履歷 (完整表格與新增表單) -->
             <div id="tab-maintenance" class="tab-content hidden space-y-6">
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
-                    <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-wrench text-amber-400"></i> 保養履歷紀錄
-                    </h3>
-                    <p class="text-xs text-slate-400">目前尚無異常維修紀錄。</p>
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
+                        <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-wrench text-amber-400"></i> 設備保養與維修履歷紀錄
+                        </h3>
+                        <button onclick="toggleMaintenanceForm()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
+                            <i class="fa-solid fa-plus"></i> 新增保養履歷
+                        </button>
+                    </div>
+
+                    <!-- 新增維修履歷表單 -->
+                    <div id="maintFormBox" class="hidden mb-6 p-4 bg-slate-900 border border-amber-500/30 rounded-xl space-y-4 text-xs">
+                        <h4 class="font-bold text-amber-400 flex items-center gap-1.5 text-xs">
+                            <i class="fa-solid fa-file-circle-plus"></i> 填寫維修/保養紀錄
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-slate-400 mb-1">保養/維修日期</label>
+                                <input type="date" id="maintDate" class="w-full bg-slate-800 border border-slate-700 p-2 rounded text-white focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">維修類別</label>
+                                <select id="maintType" class="w-full bg-slate-800 border border-slate-700 p-2 rounded text-white focus:outline-none">
+                                    <option value="定期保養">定期保養</option>
+                                    <option value="零件更換">零件更換</option>
+                                    <option value="緊急搶修">緊急搶修</option>
+                                    <option value="水質清洗">水質/水垢清洗</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">保養內容與更換零件說明</label>
+                            <textarea id="maintContent" rows="2" placeholder="例: 更換軟水器濾芯、清洗燃燒嘴..." class="w-full bg-slate-800 border border-slate-700 p-2 rounded text-white focus:outline-none"></textarea>
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <button onclick="toggleMaintenanceForm()" class="px-3 py-1.5 bg-slate-800 text-slate-300 rounded hover:bg-slate-700">取消</button>
+                            <button onclick="saveMaintenanceLog()" class="px-4 py-1.5 bg-amber-600 text-white rounded hover:bg-amber-500 font-bold">儲存履歷</button>
+                        </div>
+                    </div>
+
+                    <!-- 保養履歷表格 -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-700 text-slate-400 bg-slate-900/50">
+                                    <th class="p-3">日期</th>
+                                    <th class="p-3">項目/類型</th>
+                                    <th class="p-3">維修保養內容細節</th>
+                                    <th class="p-3">執行人員</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maintTableBody" class="divide-y divide-slate-800 text-slate-300">
+                                <!-- 動態載入 -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -241,7 +321,7 @@
     </main>
 
     <script>
-        // 預設 5 台設備，固定使用 1~5 號索引
+        // 預設 5 台設備
         const defaultBoilers = [
             { id: '1', name: '#1 貫流式鍋爐 (1.0 Ton/hr)', type: 'steam', detail: '型號: SF-1000Steam' },
             { id: '2', name: '#2 熱水鍋爐 (50萬 Kcal)', type: 'hotwater', detail: '型號: SF-500HW' },
@@ -254,28 +334,30 @@
         localStorage.setItem('sf_boilers_v3', JSON.stringify(boilers));
 
         let currentBoilerId = '1';
+        let trendChartInstance = null;
 
-        // 🎯 超強網址相容解析：從 ?b=5 或 URL 任意位置精準取得數字 5
+        // 預設模擬的保養履歷資料
+        let maintenanceLogs = JSON.parse(localStorage.getItem('sf_maint_logs')) || {
+            '1': [{ date: '2026-06-10', type: '定期保養', content: '年度大保養、更換安全閥', inspector: '張工程師' }],
+            '2': [{ date: '2026-05-15', type: '零件更換', content: '更換點火電極與電磁閥', inspector: '李工程師' }],
+            '4': [{ date: '2026-07-01', type: '水質清洗', content: '酸洗鍋爐積垢、測試水質硬度', inspector: '張工程師' }]
+        };
+
+        // 🎯 核心演算法：解析 QR Code 網址 ?b=4 或 ?boiler=4
         function detectBoilerFromURL() {
             const url = window.location.href;
-
-            // 1. 優先匹配 ?b=5 或 ?boiler=5 或 ?id=5
             const paramMatch = url.match(/[?&](?:b|boiler|id)=([0-9]+)/i);
-            if (paramMatch && paramMatch[1]) {
-                return paramMatch[1];
-            }
+            if (paramMatch && paramMatch[1]) return paramMatch[1];
 
-            // 2. 備用匹配：若 QR Code 轉碼成 %235，強行捕捉結尾的數字
             const numberMatch = url.match(/(?:%23|#|\/)?([1-9][0-9]*)(?:[^0-9]*)$/);
-            if (numberMatch && numberMatch[1]) {
-                return numberMatch[1];
-            }
+            if (numberMatch && numberMatch[1]) return numberMatch[1];
 
             return null;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentDateStr').innerText = new Date().toISOString().split('T')[0];
+            document.getElementById('maintDate').value = new Date().toISOString().split('T')[0];
 
             const scannedId = detectBoilerFromURL();
 
@@ -293,6 +375,7 @@
 
             renderBoilerSelect();
             updateUIByCurrentBoiler();
+            initChart();
         });
 
         function toggleSidebar() {
@@ -303,6 +386,10 @@
         function toggleBoilerManager() {
             document.getElementById('boilerManagerBox').classList.toggle('hidden');
             document.getElementById('qrCodeContainer').classList.add('hidden');
+        }
+
+        function toggleMaintenanceForm() {
+            document.getElementById('maintFormBox').classList.toggle('hidden');
         }
 
         function switchTab(tabName) {
@@ -317,6 +404,10 @@
             if (activeNav) {
                 activeNav.classList.add('bg-brand-600', 'text-white');
                 activeNav.classList.remove('text-slate-400');
+            }
+
+            if (tabName === 'trends') {
+                updateChartData();
             }
         }
 
@@ -343,14 +434,115 @@
             document.getElementById('editBoilerType').value = b.type;
             document.getElementById('editBoilerDetail').value = b.detail || '';
 
-            // 動態切換表單動態文字
             const lbl = document.getElementById('lblDynamicParam');
             if (lbl) {
                 lbl.innerText = b.type === 'steam' ? '蒸氣壓力 (kg/cm²)' : '熱水出水溫度 (°C)';
             }
+
+            renderMaintenanceLogs();
+            if (trendChartInstance) updateChartData();
         }
 
-        // 🖨️ 生成極簡安全的專屬 QR Code
+        // 📈 Chart.js 圖表初始化與更新
+        function initChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['07/16', '07/17', '07/18', '07/19', '07/20', '07/21', '07/22'],
+                    datasets: [
+                        {
+                            label: '出水溫度 / 蒸氣壓力',
+                            data: [60, 62, 61, 65, 64, 63, 65],
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: '排煙溫度 (°C)',
+                            data: [145, 148, 150, 152, 149, 151, 150],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+        }
+
+        function updateChartData() {
+            const b = boilers.find(x => x.id === currentBoilerId) || boilers[0];
+            document.getElementById('chartBoilerLabel').innerText = b.name;
+
+            if (b.type === 'steam') {
+                trendChartInstance.data.datasets[0].label = '蒸氣壓力 (kg/cm²)';
+                trendChartInstance.data.datasets[0].data = [6.2, 6.5, 6.4, 6.8, 6.5, 6.6, 6.7];
+            } else {
+                trendChartInstance.data.datasets[0].label = '熱水出水溫度 (°C)';
+                trendChartInstance.data.datasets[0].data = [60, 62, 61, 65, 64, 63, 65];
+            }
+            trendChartInstance.update();
+        }
+
+        // 🔧 維修履歷渲染與儲存
+        function renderMaintenanceLogs() {
+            const tbody = document.getElementById('maintTableBody');
+            const logs = maintenanceLogs[currentBoilerId] || [];
+
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">目前尚無保養維修紀錄。</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = logs.map(log => `
+                <tr class="hover:bg-slate-800/40">
+                    <td class="p-3 font-mono text-slate-400">${log.date}</td>
+                    <td class="p-3"><span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[10px]">${log.type}</span></td>
+                    <td class="p-3 text-slate-200">${log.content}</td>
+                    <td class="p-3 text-slate-400">${log.inspector}</td>
+                </tr>
+            `).join('');
+        }
+
+        function saveMaintenanceLog() {
+            const date = document.getElementById('maintDate').value;
+            const type = document.getElementById('maintType').value;
+            const content = document.getElementById('maintContent').value.trim();
+
+            if (!content) return alert('請輸入維修保養內容！');
+
+            if (!maintenanceLogs[currentBoilerId]) {
+                maintenanceLogs[currentBoilerId] = [];
+            }
+
+            maintenanceLogs[currentBoilerId].unshift({
+                date,
+                type,
+                content,
+                inspector: '張工程師'
+            });
+
+            localStorage.setItem('sf_maint_logs', JSON.stringify(maintenanceLogs));
+            document.getElementById('maintContent').value = '';
+            toggleMaintenanceForm();
+            renderMaintenanceLogs();
+            alert('維修保養履歷儲存成功！');
+        }
+
+        // 🖨️ 生成專屬 QR Code
         function generateQRCodeForCurrentBoiler() {
             const b = boilers.find(x => x.id === currentBoilerId);
             if (!b) return;
@@ -426,7 +618,7 @@
 
         function submitInspection(e) {
             e.preventDefault();
-            alert('巡檢紀錄已成功儲存！');
+            alert('日常巡檢紀錄已成功儲存！');
         }
     </script>
 </body>
