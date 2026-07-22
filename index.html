@@ -31,6 +31,12 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        @media print {
+            aside, header, button, .no-print { display: none !important; }
+            main { overflow: visible !important; }
+            body { background: white !important; color: black !important; }
+            .print-text-dark { color: black !important; }
+        }
     </style>
 </head>
 <body class="h-full flex overflow-hidden font-sans antialiased relative" onclick="closeInspectorMenuOnOutsideClick(event)">
@@ -144,7 +150,7 @@
             </nav>
         </div>
 
-        <!-- 💡 可點擊修改的巡檢員資訊欄位 -->
+        <!-- 可點擊修改的巡檢員資訊欄位 -->
         <div class="p-4 border-t border-slate-800 bg-slate-900/50 relative" id="inspectorArea">
             <div onclick="toggleInspectorMenu(event)" class="flex items-center justify-between cursor-pointer hover:bg-slate-800/80 p-2 -m-2 rounded-lg transition-colors group">
                 <div class="flex items-center gap-2.5">
@@ -186,7 +192,7 @@
     <!-- 主要內容區塊 -->
     <main class="flex-1 flex flex-col overflow-hidden bg-slate-900 w-full min-w-0">
         
-        <!-- Header -->
+        <!-- Header 包含報表匯出功能按鈕 -->
         <header class="border-b border-slate-800 bg-slate-950/40 px-4 lg:px-6 py-3 shrink-0 flex items-center justify-between gap-2">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="lg:hidden text-slate-300 hover:text-white p-1.5 rounded bg-slate-800 border border-slate-700">
@@ -201,6 +207,16 @@
                         <i class="fa-solid fa-circle-check"></i> QR 碼掃描成功
                     </span>
                 </div>
+            </div>
+
+            <!-- 📊 匯出 Excel / PDF 按鈕區 -->
+            <div class="flex items-center gap-2 no-print">
+                <button onclick="exportToCSV()" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
+                    <i class="fa-solid fa-file-excel"></i> <span class="hidden md:inline">匯出</span> Excel
+                </button>
+                <button onclick="exportToPDF()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
+                    <i class="fa-solid fa-file-pdf"></i> <span class="hidden md:inline">匯出</span> PDF/列印
+                </button>
             </div>
         </header>
 
@@ -218,7 +234,6 @@
                     </div>
 
                     <form id="inspectionForm" onsubmit="submitInspection(event)" class="space-y-5">
-                        <!-- 第一列：主要溫度/壓力與硬度 -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
                             <div>
                                 <label id="lblDynamicParam" class="block text-slate-300 font-medium mb-1.5">熱水出水溫度 (°C)</label>
@@ -234,7 +249,6 @@
                             </div>
                         </div>
 
-                        <!-- 第二列：入水溫度與燃燒狀況 -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
                             <div>
                                 <label class="block text-slate-300 font-medium mb-1.5">給水/入水溫度 (°C)</label>
@@ -262,8 +276,9 @@
                 </div>
             </div>
 
-            <!-- TAB 2: 巡檢數據與趨勢 -->
+            <!-- TAB 2: 多維度巡檢數據與趨勢圖表 -->
             <div id="tab-trends" class="tab-content hidden space-y-6">
+                <!-- 溫度/壓力趨勢主圖 -->
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
@@ -271,8 +286,31 @@
                         </h3>
                         <span id="chartBoilerLabel" class="text-xs bg-slate-900 text-sky-400 border border-slate-700 px-2 py-1 rounded font-mono"></span>
                     </div>
-                    <div class="relative h-80 w-full">
+                    <div class="relative h-72 w-full">
                         <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 次要分析圖表雙欄區塊 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 1. 水質硬度與排煙溫度分析圖 -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 shadow-md">
+                        <h4 class="text-xs font-bold text-slate-300 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-droplet text-cyan-400"></i> 水質硬度 (PPM) 與排煙溫度對比
+                        </h4>
+                        <div class="relative h-56 w-full">
+                            <canvas id="hardnessChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 2. 設備運轉狀況圓餅圖 -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 shadow-md flex flex-col items-center">
+                        <h4 class="text-xs font-bold text-slate-300 mb-3 self-start flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-amber-400"></i> 燃燒狀態與健康統計
+                        </h4>
+                        <div class="relative h-56 w-full flex justify-center">
+                            <canvas id="statusPieChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -284,7 +322,7 @@
                         <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
                             <i class="fa-solid fa-wrench text-amber-400"></i> 設備保養與維修履歷紀錄
                         </h3>
-                        <button onclick="toggleMaintenanceForm()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
+                        <button onclick="toggleMaintenanceForm()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors no-print">
                             <i class="fa-solid fa-plus"></i> 新增保養履歷
                         </button>
                     </div>
@@ -323,14 +361,14 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="border-b border-slate-700 text-slate-400 bg-slate-900/50">
+                                <tr class="border-b border-slate-700 text-slate-400 bg-slate-900/50 print-text-dark">
                                     <th class="p-3">日期</th>
                                     <th class="p-3">項目/類型</th>
                                     <th class="p-3">維修保養內容細節</th>
                                     <th class="p-3">執行人員</th>
                                 </tr>
                             </thead>
-                            <tbody id="maintTableBody" class="divide-y divide-slate-800 text-slate-300">
+                            <tbody id="maintTableBody" class="divide-y divide-slate-800 text-slate-300 print-text-dark">
                             </tbody>
                         </table>
                     </div>
@@ -354,8 +392,9 @@
 
         let currentBoilerId = '1';
         let trendChartInstance = null;
+        let hardnessChartInstance = null;
+        let statusPieChartInstance = null;
 
-        // 人員資料 LocalStorage 管理
         let inspectorInfo = JSON.parse(localStorage.getItem('sf_inspector_info')) || {
             name: '張工程師',
             dept: '廠區維護組'
@@ -367,14 +406,25 @@
             '4': [{ date: '2026-07-01', type: '水質清洗', content: '酸洗鍋爐積垢、測試水質硬度', inspector: inspectorInfo.name }]
         };
 
+        // 預設巡檢數據示範（供圖表與 Excel 匯出）
+        let inspectionRecords = JSON.parse(localStorage.getItem('sf_inspection_records')) || {
+            '1': [
+                { date: '2026-07-16', temp: 6.2, inlet: 20, flue: 160, hardness: 2, status: '正常 (藍色火焰)', memo: '良好', inspector: inspectorInfo.name },
+                { date: '2026-07-17', temp: 6.5, inlet: 22, flue: 162, hardness: 0, status: '正常 (藍色火焰)', memo: '無異常', inspector: inspectorInfo.name },
+                { date: '2026-07-18', temp: 6.4, inlet: 21, flue: 165, hardness: 5, status: '正常 (藍色火焰)', memo: '良好', inspector: inspectorInfo.name },
+                { date: '2026-07-19', temp: 6.8, inlet: 23, flue: 163, hardness: 1, status: '正常 (藍色火焰)', memo: '良好', inspector: inspectorInfo.name },
+                { date: '2026-07-20', temp: 6.5, inlet: 22, flue: 161, hardness: 0, status: '正常 (藍色火焰)', memo: '正常運轉', inspector: inspectorInfo.name },
+                { date: '2026-07-21', temp: 6.6, inlet: 21, flue: 164, hardness: 3, status: '異常 (黃紅火焰)', memo: '調整風門', inspector: inspectorInfo.name },
+                { date: '2026-07-22', temp: 6.7, inlet: 22, flue: 165, hardness: 0, status: '正常 (藍色火焰)', memo: '穩定', inspector: inspectorInfo.name }
+            ]
+        };
+
         function detectBoilerFromURL() {
             const url = window.location.href;
             const paramMatch = url.match(/[?&](?:b|boiler|id)=([0-9]+)/i);
             if (paramMatch && paramMatch[1]) return paramMatch[1];
-
             const numberMatch = url.match(/(?:%23|#|\/)?([1-9][0-9]*)(?:[^0-9]*)$/);
             if (numberMatch && numberMatch[1]) return numberMatch[1];
-
             return null;
         }
 
@@ -385,7 +435,6 @@
             updateInspectorUI();
 
             const scannedId = detectBoilerFromURL();
-
             if (scannedId) {
                 const target = boilers.find(b => b.id === scannedId);
                 if (target) {
@@ -400,10 +449,10 @@
 
             renderBoilerSelect();
             updateUIByCurrentBoiler();
-            initChart();
+            initCharts();
         });
 
-        // 👤 巡檢人員選單與更新邏輯
+        // 人員編輯選單邏輯
         function toggleInspectorMenu(e) {
             e.stopPropagation();
             const box = document.getElementById('inspectorEditBox');
@@ -424,7 +473,6 @@
         function saveInspectorInfo() {
             const name = document.getElementById('inputInspectorName').value.trim();
             const dept = document.getElementById('inputInspectorDept').value.trim();
-
             if (!name) return alert('請輸入姓名！');
 
             inspectorInfo.name = name;
@@ -470,7 +518,7 @@
             }
 
             if (tabName === 'trends') {
-                updateChartData();
+                updateAllChartsData();
             }
         }
 
@@ -503,77 +551,125 @@
             }
 
             renderMaintenanceLogs();
-            if (trendChartInstance) updateChartData();
+            if (trendChartInstance) updateAllChartsData();
         }
 
-        function initChart() {
-            const ctx = document.getElementById('trendChart').getContext('2d');
-            trendChartInstance = new Chart(ctx, {
+        // 📈 初始化多圖表
+        function initCharts() {
+            // 1. 主趨勢折線圖
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            trendChartInstance = new Chart(ctxTrend, {
                 type: 'line',
                 data: {
                     labels: ['07/16', '07/17', '07/18', '07/19', '07/20', '07/21', '07/22'],
                     datasets: [
-                        {
-                            label: '熱水出水溫度 (°C)',
-                            data: [60, 62, 61, 65, 64, 63, 65],
-                            borderColor: '#38bdf8',
-                            backgroundColor: 'rgba(56, 189, 248, 0.08)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: '入水溫度 (°C)',
-                            data: [22, 23, 21, 25, 24, 23, 25],
-                            borderColor: '#10b981',
-                            backgroundColor: 'transparent',
-                            tension: 0.3
-                        },
-                        {
-                            label: '排煙溫度 (°C)',
-                            data: [145, 148, 150, 152, 149, 151, 150],
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'transparent',
-                            borderDash: [5, 5],
-                            tension: 0.3
-                        }
+                        { label: '熱水出水溫度 (°C)', data: [60, 62, 61, 65, 64, 63, 65], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.08)', fill: true, tension: 0.3 },
+                        { label: '入水溫度 (°C)', data: [22, 23, 21, 25, 24, 23, 25], borderColor: '#10b981', fill: false, tension: 0.3 },
+                        { label: '排煙溫度 (°C)', data: [145, 148, 150, 152, 149, 151, 150], borderColor: '#f59e0b', borderDash: [5, 5], fill: false, tension: 0.3 }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
-                    },
+                    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
                     scales: {
                         x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
                         y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
                     }
                 }
             });
+
+            // 2. 水質硬度長條圖
+            const ctxHardness = document.getElementById('hardnessChart').getContext('2d');
+            hardnessChartInstance = new Chart(ctxHardness, {
+                type: 'bar',
+                data: {
+                    labels: ['07/16', '07/17', '07/18', '07/19', '07/20', '07/21', '07/22'],
+                    datasets: [
+                        { label: '水質硬度 (PPM)', data: [2, 0, 5, 1, 0, 3, 0], backgroundColor: '#22d3ee' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+
+            // 3. 燃燒狀態圓餅圖
+            const ctxPie = document.getElementById('statusPieChart').getContext('2d');
+            statusPieChartInstance = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['正常 (藍色火焰)', '異常 (黃紅火焰)', '冒黑煙/異音'],
+                    datasets: [{
+                        data: [6, 1, 0],
+                        backgroundColor: ['#10b981', '#f59e0b', '#f43f5e']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } } }
+                }
+            });
         }
 
-        function updateChartData() {
+        function updateAllChartsData() {
             const b = boilers.find(x => x.id === currentBoilerId) || boilers[0];
             document.getElementById('chartBoilerLabel').innerText = b.name;
 
             if (b.type === 'steam') {
                 trendChartInstance.data.datasets[0].label = '蒸氣壓力 (kg/cm²)';
                 trendChartInstance.data.datasets[0].data = [6.2, 6.5, 6.4, 6.8, 6.5, 6.6, 6.7];
-                
                 trendChartInstance.data.datasets[1].label = '給水/入水溫度 (°C)';
                 trendChartInstance.data.datasets[1].data = [20, 22, 21, 23, 22, 21, 22];
-
                 trendChartInstance.data.datasets[2].data = [160, 162, 165, 163, 161, 164, 165];
             } else {
                 trendChartInstance.data.datasets[0].label = '熱水出水溫度 (°C)';
                 trendChartInstance.data.datasets[0].data = [60, 62, 61, 65, 64, 63, 65];
-
                 trendChartInstance.data.datasets[1].label = '入水溫度 (°C)';
                 trendChartInstance.data.datasets[1].data = [22, 23, 21, 25, 24, 23, 25];
-
                 trendChartInstance.data.datasets[2].data = [145, 148, 150, 152, 149, 151, 150];
             }
             trendChartInstance.update();
+            hardnessChartInstance.update();
+            statusPieChartInstance.update();
+        }
+
+        // 📥 匯出 Excel (CSV 格式)
+        function exportToCSV() {
+            const b = boilers.find(x => x.id === currentBoilerId) || boilers[0];
+            const records = inspectionRecords[currentBoilerId] || [];
+
+            let csvContent = "\uFEFF"; // UTF-8 BOM，防止 Excel 開啟時簡體/繁體亂碼
+            csvContent += `設備名稱,${b.name}\n`;
+            csvContent += `設備類型,${b.type === 'steam' ? '蒸氣鍋爐' : '熱水鍋爐'}\n`;
+            csvContent += `匯出時間,${new Date().toLocaleString()}\n\n`;
+
+            csvContent += "日期,主要數值(壓力/溫度),給水溫度(°C),排煙溫度(°C),水質硬度(PPM),燃燒狀況,巡檢備註,巡檢人員\n";
+
+            records.forEach(r => {
+                csvContent += `"${r.date}","${r.temp}","${r.inlet}","${r.flue}","${r.hardness}","${r.status}","${r.memo}","${r.inspector}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `碩豐熱能_${b.name}_巡檢報表.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 📄 匯出 PDF / 列印報表
+        function exportToPDF() {
+            window.print();
         }
 
         function renderMaintenanceLogs() {
@@ -587,10 +683,10 @@
 
             tbody.innerHTML = logs.map(log => `
                 <tr class="hover:bg-slate-800/40">
-                    <td class="p-3 font-mono text-slate-400">${log.date}</td>
+                    <td class="p-3 font-mono text-slate-400 print-text-dark">${log.date}</td>
                     <td class="p-3"><span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[10px]">${log.type}</span></td>
-                    <td class="p-3 text-slate-200">${log.content}</td>
-                    <td class="p-3 text-slate-400">${log.inspector}</td>
+                    <td class="p-3 text-slate-200 print-text-dark">${log.content}</td>
+                    <td class="p-3 text-slate-400 print-text-dark">${log.inspector}</td>
                 </tr>
             `).join('');
         }
@@ -695,7 +791,26 @@
 
         function submitInspection(e) {
             e.preventDefault();
+
+            const record = {
+                date: new Date().toISOString().split('T')[0],
+                temp: document.getElementById('inputDynamicParam').value,
+                flue: document.getElementById('inputFlueTemp').value,
+                hardness: document.getElementById('inputHardness').value || 0,
+                inlet: document.getElementById('inputInletTemp').value || 0,
+                status: document.getElementById('selectBurner').value,
+                memo: document.getElementById('inspectionMemo').value || '無',
+                inspector: inspectorInfo.name
+            };
+
+            if (!inspectionRecords[currentBoilerId]) {
+                inspectionRecords[currentBoilerId] = [];
+            }
+            inspectionRecords[currentBoilerId].push(record);
+            localStorage.setItem('sf_inspection_records', JSON.stringify(inspectionRecords));
+
             alert(`巡檢紀錄已儲存！ (巡檢員: ${inspectorInfo.name})`);
+            document.getElementById('inspectionForm').reset();
         }
     </script>
 </body>
