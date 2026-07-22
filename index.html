@@ -33,7 +33,7 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     </style>
 </head>
-<body class="h-full flex overflow-hidden font-sans antialiased relative">
+<body class="h-full flex overflow-hidden font-sans antialiased relative" onclick="closeInspectorMenuOnOutsideClick(event)">
 
     <!-- 手機版側邊欄遮罩 -->
     <div id="mobileBackdrop" class="hidden fixed inset-0 bg-black/60 z-30 lg:hidden" onclick="toggleSidebar()"></div>
@@ -144,18 +144,41 @@
             </nav>
         </div>
 
-        <!-- 底部巡檢員資訊 -->
-        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
-            <div class="flex items-center justify-between">
+        <!-- 💡 可點擊修改的巡檢員資訊欄位 -->
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50 relative" id="inspectorArea">
+            <div onclick="toggleInspectorMenu(event)" class="flex items-center justify-between cursor-pointer hover:bg-slate-800/80 p-2 -m-2 rounded-lg transition-colors group">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-full bg-sky-600/30 border border-sky-500/50 flex items-center justify-center text-xs font-bold text-sky-300">巡</div>
+                    <div id="inspectorAvatar" class="w-8 h-8 rounded-full bg-sky-600/30 border border-sky-500/50 flex items-center justify-center text-xs font-bold text-sky-300 group-hover:scale-105 transition-transform">
+                        張
+                    </div>
                     <div class="text-xs">
                         <p class="text-white font-medium flex items-center gap-1">
                             <span id="inspectorName">張工程師</span>
+                            <i class="fa-solid fa-pen text-[10px] text-slate-500 group-hover:text-sky-400 transition-colors"></i>
                         </p>
                         <p class="text-slate-400 text-[10px]" id="inspectorDept">廠區維護組</p>
                     </div>
                 </div>
+                <i class="fa-solid fa-ellipsis-vertical text-slate-500 group-hover:text-slate-300 text-xs"></i>
+            </div>
+
+            <!-- 修改人員資料彈出面板 -->
+            <div id="inspectorEditBox" class="hidden absolute bottom-full left-4 right-4 mb-2 p-3 bg-slate-950 border border-slate-700 rounded-xl shadow-2xl space-y-2.5 z-50 text-xs">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                    <span class="font-bold text-slate-200 flex items-center gap-1"><i class="fa-solid fa-user-gear text-sky-400"></i> 修改巡檢人員</span>
+                    <button onclick="toggleInspectorMenu(event)" class="text-slate-400 hover:text-white">✕</button>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-0.5">巡檢員姓名：</label>
+                    <input type="text" id="inputInspectorName" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-0.5">所屬部門/組別：</label>
+                    <input type="text" id="inputInspectorDept" class="w-full bg-slate-800 border border-slate-700 p-1.5 rounded text-white text-xs focus:outline-none focus:border-sky-500">
+                </div>
+                <button onclick="saveInspectorInfo()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-1.5 rounded text-[11px] font-bold transition-colors">
+                    儲存變更
+                </button>
             </div>
         </div>
     </aside>
@@ -239,7 +262,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: 巡檢數據與趨勢 (已新增「入水溫度」曲線) -->
+            <!-- TAB 2: 巡檢數據與趨勢 -->
             <div id="tab-trends" class="tab-content hidden space-y-6">
                 <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 lg:p-6 shadow-md">
                     <div class="flex justify-between items-center mb-4">
@@ -332,10 +355,16 @@
         let currentBoilerId = '1';
         let trendChartInstance = null;
 
+        // 人員資料 LocalStorage 管理
+        let inspectorInfo = JSON.parse(localStorage.getItem('sf_inspector_info')) || {
+            name: '張工程師',
+            dept: '廠區維護組'
+        };
+
         let maintenanceLogs = JSON.parse(localStorage.getItem('sf_maint_logs')) || {
-            '1': [{ date: '2026-06-10', type: '定期保養', content: '年度大保養、更換安全閥', inspector: '張工程師' }],
+            '1': [{ date: '2026-06-10', type: '定期保養', content: '年度大保養、更換安全閥', inspector: inspectorInfo.name }],
             '2': [{ date: '2026-05-15', type: '零件更換', content: '更換點火電極與電磁閥', inspector: '李工程師' }],
-            '4': [{ date: '2026-07-01', type: '水質清洗', content: '酸洗鍋爐積垢、測試水質硬度', inspector: '張工程師' }]
+            '4': [{ date: '2026-07-01', type: '水質清洗', content: '酸洗鍋爐積垢、測試水質硬度', inspector: inspectorInfo.name }]
         };
 
         function detectBoilerFromURL() {
@@ -352,6 +381,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentDateStr').innerText = new Date().toISOString().split('T')[0];
             document.getElementById('maintDate').value = new Date().toISOString().split('T')[0];
+
+            updateInspectorUI();
 
             const scannedId = detectBoilerFromURL();
 
@@ -371,6 +402,44 @@
             updateUIByCurrentBoiler();
             initChart();
         });
+
+        // 👤 巡檢人員選單與更新邏輯
+        function toggleInspectorMenu(e) {
+            e.stopPropagation();
+            const box = document.getElementById('inspectorEditBox');
+            box.classList.toggle('hidden');
+            if (!box.classList.contains('hidden')) {
+                document.getElementById('inputInspectorName').value = inspectorInfo.name;
+                document.getElementById('inputInspectorDept').value = inspectorInfo.dept;
+            }
+        }
+
+        function closeInspectorMenuOnOutsideClick(e) {
+            const area = document.getElementById('inspectorArea');
+            if (area && !area.contains(e.target)) {
+                document.getElementById('inspectorEditBox').classList.add('hidden');
+            }
+        }
+
+        function saveInspectorInfo() {
+            const name = document.getElementById('inputInspectorName').value.trim();
+            const dept = document.getElementById('inputInspectorDept').value.trim();
+
+            if (!name) return alert('請輸入姓名！');
+
+            inspectorInfo.name = name;
+            inspectorInfo.dept = dept || '巡檢維護組';
+
+            localStorage.setItem('sf_inspector_info', JSON.stringify(inspectorInfo));
+            updateInspectorUI();
+            document.getElementById('inspectorEditBox').classList.add('hidden');
+        }
+
+        function updateInspectorUI() {
+            document.getElementById('inspectorName').innerText = inspectorInfo.name;
+            document.getElementById('inspectorDept').innerText = inspectorInfo.dept;
+            document.getElementById('inspectorAvatar').innerText = inspectorInfo.name.charAt(0) || '巡';
+        }
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
@@ -437,7 +506,6 @@
             if (trendChartInstance) updateChartData();
         }
 
-        // 📈 Chart.js 圖表（包含：熱水出水溫/蒸氣壓力、入水溫度、排煙溫度）
         function initChart() {
             const ctx = document.getElementById('trendChart').getContext('2d');
             trendChartInstance = new Chart(ctx, {
@@ -448,7 +516,7 @@
                         {
                             label: '熱水出水溫度 (°C)',
                             data: [60, 62, 61, 65, 64, 63, 65],
-                            borderColor: '#38bdf8', // 亮藍色
+                            borderColor: '#38bdf8',
                             backgroundColor: 'rgba(56, 189, 248, 0.08)',
                             fill: true,
                             tension: 0.3
@@ -456,14 +524,14 @@
                         {
                             label: '入水溫度 (°C)',
                             data: [22, 23, 21, 25, 24, 23, 25],
-                            borderColor: '#10b981', // 翡翠綠
+                            borderColor: '#10b981',
                             backgroundColor: 'transparent',
                             tension: 0.3
                         },
                         {
                             label: '排煙溫度 (°C)',
                             data: [145, 148, 150, 152, 149, 151, 150],
-                            borderColor: '#f59e0b', // 琥珀黃
+                            borderColor: '#f59e0b',
                             backgroundColor: 'transparent',
                             borderDash: [5, 5],
                             tension: 0.3
@@ -542,7 +610,7 @@
                 date,
                 type,
                 content,
-                inspector: '張工程師'
+                inspector: inspectorInfo.name
             });
 
             localStorage.setItem('sf_maint_logs', JSON.stringify(maintenanceLogs));
@@ -627,7 +695,7 @@
 
         function submitInspection(e) {
             e.preventDefault();
-            alert('日常巡檢紀錄已成功儲存！');
+            alert(`巡檢紀錄已儲存！ (巡檢員: ${inspectorInfo.name})`);
         }
     </script>
 </body>
